@@ -1,0 +1,134 @@
+Phase 1 – MVP: Core Functionality & Data Collection
+Goal: Launch a functional app that accurately checks bag dimensions against under-seat space using manual inputs and external data.
+
+Features:
+
+User Authentication: Users can create an account and log in.
+
+Manual Bag Input: Users can manually enter bag dimensions or select a bag from a pre-populated list.
+
+Google Search Fallback: If a bag is not in the database, the app will use the Google Custom Search API to find manufacturer dimensions and cache them for future use.
+
+Flight & Seat Input: Users input their airline, flight number, and seat number.
+
+Core Logic: The app will compare bag dimensions to the specific under-seat dimensions for the given flight and seat, as well as the airline's general under-seat bag policy.
+
+Pet Carrier Option: A checkbox for "Traveling with a pet?" will trigger pet-specific rules, including checking if pet carriers are allowed in the chosen seat.
+
+Output Display: The app will display a clear "Fits" or "Doesn't Fit" result. The output will also show the user's bag dimensions, the airline's stated maximum dimensions, and the specific under-seat space available.
+
+My Bags Feature: Users can save their bags to their profile for easy access in the future.
+
+Phase 2 – Enhanced UX & Community Data
+Goal: Improve the user experience and begin building a self-sustaining community data layer.
+
+Features:
+
+Seat Recommendations: If a bag doesn't fit, the app will suggest alternative seats on the same flight with more space.
+
+User Preferences: The app will remember the user's preferred unit of measurement (inches or centimeters).
+
+Community Data Contribution: If a user’s bag dimensions don’t match manufacturer specs, they will be prompted to manually measure their bag. This data will be saved to the community layer.
+
+Phase 3 – Advanced Photo & AI Features
+Goal: Automate data entry and improve measurement accuracy using computer vision.
+
+Features:
+
+AI/AR Measurement: Users can upload a photo of their bag next to a reference object for AI-based dimension estimation.
+
+Reverse Image Search: The app will use a reverse image search API to identify the bag model and retrieve manufacturer specifications for cross-verification.
+
+Dimension Verification: The app will compare AI estimates, manufacturer specs, and community data to determine the most accurate dimensions.
+
+Database Schema
+This schema is designed to support all phases of the roadmap.
+
+SQL
+
+-- Table for user profiles
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    username VARCHAR(255),
+    password_hash VARCHAR(255) NOT NULL,
+    preferred_unit ENUM('cm', 'in') DEFAULT 'in',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table for bags, storing specs from all sources
+CREATE TABLE bags (
+    bag_id INT PRIMARY KEY AUTO_INCREMENT,
+    brand VARCHAR(255),
+    model VARCHAR(255),
+    manufacturer_height_cm DECIMAL(10, 2),
+    manufacturer_width_cm DECIMAL(10, 2),
+    manufacturer_depth_cm DECIMAL(10, 2),
+    ai_estimate_height_cm DECIMAL(10, 2),
+    ai_estimate_width_cm DECIMAL(10, 2),
+    ai_estimate_depth_cm DECIMAL(10, 2),
+    is_pet_carrier BOOLEAN DEFAULT FALSE,
+    carrier_type ENUM('hard-sided', 'soft-sided'),
+    is_verified BOOLEAN DEFAULT FALSE,
+    image_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Junction table for users to save bags
+CREATE TABLE user_bags (
+    user_bag_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    bag_id INT,
+    custom_name VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (bag_id) REFERENCES bags(bag_id)
+);
+
+-- Table for airline information
+CREATE TABLE airlines (
+    airline_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255),
+    iata_code VARCHAR(2),
+    max_carryon_height_cm DECIMAL(10, 2),
+    max_carryon_width_cm DECIMAL(10, 2),
+    max_carryon_depth_cm DECIMAL(10, 2)
+);
+
+-- Table for aircraft information
+CREATE TABLE aircrafts (
+    aircraft_id INT PRIMARY KEY AUTO_INCREMENT,
+    model_name VARCHAR(255),
+    manufacturer VARCHAR(255)
+);
+
+-- Table for under-seat space dimensions
+CREATE TABLE seat_spaces (
+    seat_space_id INT PRIMARY KEY AUTO_INCREMENT,
+    aircraft_id INT,
+    airline_id INT,
+    seat_position ENUM('aisle', 'center', 'window'),
+    height_cm DECIMAL(10, 2),
+    width_cm DECIMAL(10, 2),
+    depth_cm DECIMAL(10, 2),
+    is_pet_carrier_allowed BOOLEAN DEFAULT TRUE,
+    pet_carrier_max_height_cm DECIMAL(10, 2),
+    notes TEXT,
+    FOREIGN KEY (aircraft_id) REFERENCES aircrafts(aircraft_id),
+    FOREIGN KEY (airline_id) REFERENCES airlines(airline_id)
+);
+
+-- Table for community-contributed data
+CREATE TABLE community_data (
+    community_data_id INT PRIMARY KEY AUTO_INCREMENT,
+    bag_id INT,
+    user_id INT,
+    user_height_cm DECIMAL(10, 2),
+    user_width_cm DECIMAL(10, 2),
+    user_depth_cm DECIMAL(10, 2),
+    fit_status ENUM('fits', 'does_not_fit'),
+    is_verified BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (bag_id) REFERENCES bags(bag_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
