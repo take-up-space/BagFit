@@ -1,0 +1,478 @@
+import { useAuth } from "@/hooks/useAuth";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { Link } from "wouter";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { isUnauthorizedError } from "@/lib/authUtils";
+
+interface UserBag {
+  id: string;
+  customName: string;
+  createdAt: string;
+  bag: {
+    id: string;
+    brand: string;
+    model: string;
+    lengthCm: string;
+    widthCm: string;
+    heightCm: string;
+    isPetCarrier: boolean;
+  };
+}
+
+function cmToInches(cm: number): number {
+  return Math.round(cm / 2.54 * 100) / 100;
+}
+
+export default function MyBags() {
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [formData, setFormData] = useState({
+    customName: "",
+    brand: "",
+    model: "",
+    lengthCm: "",
+    widthCm: "",
+    heightCm: "",
+    isPetCarrier: false,
+  });
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+      return;
+    }
+  }, [isAuthenticated, authLoading, toast]);
+
+  const { data: userBags, isLoading } = useQuery({
+    queryKey: ["/api/user/bags"],
+    retry: false,
+    enabled: isAuthenticated,
+  });
+
+  const addBagMutation = useMutation({
+    mutationFn: async (bagData: any) => {
+      // First create the bag
+      const bagResponse = await apiRequest("POST", "/api/bags", {
+        brand: bagData.brand,
+        model: bagData.model,
+        lengthCm: parseFloat(bagData.lengthCm),
+        widthCm: parseFloat(bagData.widthCm),
+        heightCm: parseFloat(bagData.heightCm),
+        isPetCarrier: bagData.isPetCarrier,
+      });
+      
+      const bag = await bagResponse.json();
+      
+      // Then add it to user's collection
+      const userBagResponse = await apiRequest("POST", "/api/user/bags", {
+        bagId: bag.id,
+        customName: bagData.customName,
+      });
+      
+      return await userBagResponse.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/bags"] });
+      setShowAddForm(false);
+      setFormData({
+        customName: "",
+        brand: "",
+        model: "",
+        lengthCm: "",
+        widthCm: "",
+        heightCm: "",
+        isPetCarrier: false,
+      });
+      toast({
+        title: "Success",
+        description: "Bag added to your collection!",
+      });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to add bag. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const removeBagMutation = useMutation({
+    mutationFn: async (bagId: string) => {
+      await apiRequest("DELETE", `/api/user/bags/${bagId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/bags"] });
+      toast({
+        title: "Success",
+        description: "Bag removed from your collection.",
+      });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to remove bag. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.customName || !formData.brand || !formData.model || 
+        !formData.lengthCm || !formData.widthCm || !formData.heightCm) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    addBagMutation.mutate(formData);
+  };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <i className="fas fa-spinner fa-spin text-4xl text-airline-blue mb-4"></i>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null; // Will redirect
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <Link href="/" className="text-2xl font-bold text-airline-blue">
+                <i className="fas fa-plane mr-2"></i>BagFit
+              </Link>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link 
+                href="/"
+                className="text-gray-600 hover:text-airline-blue transition-colors"
+                data-testid="link-home"
+              >
+                <i className="fas fa-home mr-1"></i>Home
+              </Link>
+              <div className="flex items-center space-x-2">
+                {user?.profileImageUrl && (
+                  <img 
+                    src={user.profileImageUrl} 
+                    alt="Profile" 
+                    className="w-8 h-8 rounded-full object-cover"
+                    data-testid="img-profile"
+                  />
+                )}
+                <span className="text-gray-700" data-testid="text-username">
+                  {user?.firstName || user?.email || 'User'}
+                </span>
+              </div>
+              <a 
+                href="/api/logout"
+                className="text-gray-600 hover:text-red-600 transition-colors"
+                data-testid="button-logout"
+              >
+                <i className="fas fa-sign-out-alt mr-1"></i>Logout
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        {/* Page Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">My Bags</h1>
+            <p className="text-gray-600 mt-2">Manage your saved bag collection</p>
+          </div>
+          <Button 
+            onClick={() => setShowAddForm(true)}
+            className="bg-airline-blue hover:bg-blue-700"
+            data-testid="button-add-bag"
+          >
+            <i className="fas fa-plus mr-2"></i>Add New Bag
+          </Button>
+        </div>
+
+        {/* Add Bag Form */}
+        {showAddForm && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                Add New Bag
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setShowAddForm(false)}
+                  data-testid="button-cancel-add"
+                >
+                  <i className="fas fa-times"></i>
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="customName">Custom Name *</Label>
+                    <Input
+                      id="customName"
+                      value={formData.customName}
+                      onChange={(e) => setFormData(prev => ({ ...prev, customName: e.target.value }))}
+                      placeholder="My Travel Backpack"
+                      data-testid="input-custom-name"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="brand">Brand *</Label>
+                    <Input
+                      id="brand"
+                      value={formData.brand}
+                      onChange={(e) => setFormData(prev => ({ ...prev, brand: e.target.value }))}
+                      placeholder="Samsonite"
+                      data-testid="input-brand"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="model">Model *</Label>
+                    <Input
+                      id="model"
+                      value={formData.model}
+                      onChange={(e) => setFormData(prev => ({ ...prev, model: e.target.value }))}
+                      placeholder="Winfield 3"
+                      data-testid="input-model"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="lengthCm">Length (cm) *</Label>
+                    <Input
+                      id="lengthCm"
+                      type="number"
+                      step="0.1"
+                      value={formData.lengthCm}
+                      onChange={(e) => setFormData(prev => ({ ...prev, lengthCm: e.target.value }))}
+                      placeholder="45.0"
+                      data-testid="input-length"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="widthCm">Width (cm) *</Label>
+                    <Input
+                      id="widthCm"
+                      type="number"
+                      step="0.1"
+                      value={formData.widthCm}
+                      onChange={(e) => setFormData(prev => ({ ...prev, widthCm: e.target.value }))}
+                      placeholder="35.0"
+                      data-testid="input-width"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="heightCm">Height (cm) *</Label>
+                    <Input
+                      id="heightCm"
+                      type="number"
+                      step="0.1"
+                      value={formData.heightCm}
+                      onChange={(e) => setFormData(prev => ({ ...prev, heightCm: e.target.value }))}
+                      placeholder="20.0"
+                      data-testid="input-height"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isPetCarrier"
+                    checked={formData.isPetCarrier}
+                    onChange={(e) => setFormData(prev => ({ ...prev, isPetCarrier: e.target.checked }))}
+                    data-testid="input-pet-carrier"
+                  />
+                  <Label htmlFor="isPetCarrier">This is a pet carrier</Label>
+                </div>
+
+                <div className="flex space-x-4">
+                  <Button 
+                    type="submit" 
+                    disabled={addBagMutation.isPending}
+                    className="bg-airline-blue hover:bg-blue-700"
+                    data-testid="button-save-bag"
+                  >
+                    {addBagMutation.isPending ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin mr-2"></i>
+                        Adding...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-save mr-2"></i>
+                        Add Bag
+                      </>
+                    )}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => setShowAddForm(false)}
+                    data-testid="button-cancel"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Bags Grid */}
+        {isLoading ? (
+          <div className="text-center py-8">
+            <i className="fas fa-spinner fa-spin text-4xl text-airline-blue mb-4"></i>
+            <p className="text-gray-600">Loading your bags...</p>
+          </div>
+        ) : !userBags || userBags.length === 0 ? (
+          <Card className="text-center py-16">
+            <CardContent>
+              <i className="fas fa-suitcase text-6xl text-gray-300 mb-4"></i>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">No bags saved yet</h3>
+              <p className="text-gray-600 mb-6">Add your first bag to start building your collection</p>
+              <Button 
+                onClick={() => setShowAddForm(true)}
+                className="bg-airline-blue hover:bg-blue-700"
+                data-testid="button-add-first-bag"
+              >
+                <i className="fas fa-plus mr-2"></i>Add Your First Bag
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {userBags.map((userBag: UserBag) => (
+              <Card key={userBag.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg" data-testid={`text-bag-name-${userBag.id}`}>
+                      {userBag.customName}
+                    </CardTitle>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeBagMutation.mutate(userBag.bag.id)}
+                      disabled={removeBagMutation.isPending}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      data-testid={`button-remove-${userBag.id}`}
+                    >
+                      <i className="fas fa-trash"></i>
+                    </Button>
+                  </div>
+                  <p className="text-sm text-gray-600" data-testid={`text-bag-brand-${userBag.id}`}>
+                    {userBag.bag.brand} {userBag.bag.model}
+                  </p>
+                  {userBag.bag.isPetCarrier && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-800">
+                      <i className="fas fa-paw mr-1"></i>Pet Carrier
+                    </span>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-3 gap-3 text-sm">
+                      <div className="text-center">
+                        <div className="font-medium text-gray-900" data-testid={`text-length-${userBag.id}`}>
+                          {parseFloat(userBag.bag.lengthCm).toFixed(1)}cm
+                        </div>
+                        <div className="text-gray-500">
+                          {cmToInches(parseFloat(userBag.bag.lengthCm))}"
+                        </div>
+                        <div className="text-xs text-gray-400">Length</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-medium text-gray-900" data-testid={`text-width-${userBag.id}`}>
+                          {parseFloat(userBag.bag.widthCm).toFixed(1)}cm
+                        </div>
+                        <div className="text-gray-500">
+                          {cmToInches(parseFloat(userBag.bag.widthCm))}"
+                        </div>
+                        <div className="text-xs text-gray-400">Width</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-medium text-gray-900" data-testid={`text-height-${userBag.id}`}>
+                          {parseFloat(userBag.bag.heightCm).toFixed(1)}cm
+                        </div>
+                        <div className="text-gray-500">
+                          {cmToInches(parseFloat(userBag.bag.heightCm))}"
+                        </div>
+                        <div className="text-xs text-gray-400">Height</div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-xs text-gray-500">
+                      Added {new Date(userBag.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
