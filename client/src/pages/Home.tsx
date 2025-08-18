@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import BagCheckForm from "@/components/BagCheckForm";
 import Sidebar from "@/components/Sidebar";
 import AirlineReference from "@/components/AirlineReference";
+import airplaneSeatIcon from "@assets/generated_images/airplane_seat_side_view_178d3b13.png";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
@@ -16,8 +17,13 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-airline-blue">
-                <i className="fas fa-plane mr-2"></i>BagFit
+              <h1 className="text-2xl font-bold text-airline-blue flex items-center">
+                <img 
+                  src={airplaneSeatIcon} 
+                  alt="Airplane seat" 
+                  className="w-6 h-6 mr-2"
+                />
+                BagFit
               </h1>
             </div>
             <div className="flex items-center space-x-4">
