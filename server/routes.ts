@@ -184,9 +184,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const checkSchema = z.object({
         airlineIataCode: z.string(),
         flightNumber: z.string().optional(),
-        bagLengthCm: z.number().positive(),
-        bagWidthCm: z.number().positive(),
-        bagHeightCm: z.number().positive(),
+        bagLengthCm: z.union([z.number(), z.string()]).transform(val => typeof val === 'string' ? parseFloat(val) : val),
+        bagWidthCm: z.union([z.number(), z.string()]).transform(val => typeof val === 'string' ? parseFloat(val) : val),
+        bagHeightCm: z.union([z.number(), z.string()]).transform(val => typeof val === 'string' ? parseFloat(val) : val),
         isPetCarrier: z.boolean().default(false),
         bagId: z.string().optional(),
       });

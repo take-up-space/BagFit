@@ -53,13 +53,13 @@ export default function BagCheckForm() {
   const [checkResult, setCheckResult] = useState<any>(null);
 
   // Fetch airlines
-  const { data: airlines } = useQuery({
+  const { data: airlines = [] } = useQuery<Airline[]>({
     queryKey: ["/api/airlines"],
     retry: false,
   });
 
   // Fetch user bags (optional, only if authenticated)
-  const { data: userBags } = useQuery({
+  const { data: userBags = [] } = useQuery<UserBag[]>({
     queryKey: ["/api/user/bags"],
     retry: false,
     meta: { on401: "returnNull" },
@@ -107,7 +107,7 @@ export default function BagCheckForm() {
 
     if (selectedUserBag) {
       // Use selected user bag dimensions
-      const userBag = userBags?.find((ub: UserBag) => ub.id === selectedUserBag);
+      const userBag = userBags.find((ub: UserBag) => ub.id === selectedUserBag);
       if (!userBag) {
         toast({
           title: "Error",
@@ -198,7 +198,7 @@ export default function BagCheckForm() {
                       <SelectValue placeholder="Choose airline..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {airlines?.map((airline: Airline) => (
+                      {airlines.map((airline: Airline) => (
                         <SelectItem key={airline.id} value={airline.iataCode} data-testid={`option-airline-${airline.iataCode}`}>
                           {airline.name}
                         </SelectItem>
@@ -310,7 +310,7 @@ export default function BagCheckForm() {
               </div>
 
               {/* Alternative: Select from My Bags */}
-              {userBags && userBags.length > 0 && (
+              {userBags.length > 0 && (
                 <>
                   <div className="text-center text-gray-500 text-sm mb-4">or</div>
                   <div className="flex items-center space-x-4">
