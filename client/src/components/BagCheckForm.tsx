@@ -123,68 +123,33 @@ export default function BagCheckForm() {
 
     let bagLengthCm, bagWidthCm, bagHeightCm;
 
-    if (selectedKnownBag) {
-      // Use selected known bag dimensions
-      const knownBag = knownBags.find((kb: KnownBag) => kb.id === selectedKnownBag);
-      if (!knownBag) {
-        toast({
-          title: "Error",
-          description: "Selected bag not found.",
-          variant: "destructive",
-        });
-        return;
-      }
-      bagLengthCm = parseFloat(knownBag.lengthCm);
-      bagWidthCm = parseFloat(knownBag.widthCm);
-      bagHeightCm = parseFloat(knownBag.heightCm);
-      setIsPetCarrier(knownBag.isPetCarrier);
-    } else if (selectedUserBag) {
-      // Use selected user bag dimensions
-      const userBag = userBags.find((ub: UserBag) => ub.id === selectedUserBag);
-      if (!userBag) {
-        toast({
-          title: "Error",
-          description: "Selected bag not found.",
-          variant: "destructive",
-        });
-        return;
-      }
-      bagLengthCm = parseFloat(userBag.bag.lengthCm);
-      bagWidthCm = parseFloat(userBag.bag.widthCm);
-      bagHeightCm = parseFloat(userBag.bag.heightCm);
-      setIsPetCarrier(userBag.bag.isPetCarrier);
+    // Always use manual dimensions (which may be pre-filled from bag selection)
+    if (!dimensions.length || !dimensions.width || !dimensions.height) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter all bag dimensions or select a bag from the list.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Convert dimensions to cm for API call
+    if (unit === "in") {
+      bagLengthCm = inchesToCm(parseFloat(dimensions.length));
+      bagWidthCm = inchesToCm(parseFloat(dimensions.width));
+      bagHeightCm = inchesToCm(parseFloat(dimensions.height));
     } else {
-      // Use manual dimensions
-      if (!dimensions.length || !dimensions.width || !dimensions.height) {
-        toast({
-          title: "Error",
-          description: "Please enter all bag dimensions.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const length = parseFloat(dimensions.length);
-      const width = parseFloat(dimensions.width);
-      const height = parseFloat(dimensions.height);
-
-      if (unit === "in") {
-        bagLengthCm = inchesToCm(length);
-        bagWidthCm = inchesToCm(width);
-        bagHeightCm = inchesToCm(height);
-      } else {
-        bagLengthCm = length;
-        bagWidthCm = width;
-        bagHeightCm = height;
-      }
+      bagLengthCm = parseFloat(dimensions.length);
+      bagWidthCm = parseFloat(dimensions.width);
+      bagHeightCm = parseFloat(dimensions.height);
     }
 
     checkBagMutation.mutate({
       airlineIataCode: selectedAirline,
       flightNumber: flightNumber || undefined,
-      bagLengthCm,
-      bagWidthCm,
-      bagHeightCm,
+      bagLengthCm: bagLengthCm.toString(),
+      bagWidthCm: bagWidthCm.toString(),
+      bagHeightCm: bagHeightCm.toString(),
       isPetCarrier,
       bagId: selectedKnownBag || selectedUserBag || undefined,
     });
@@ -193,8 +158,20 @@ export default function BagCheckForm() {
   const handleKnownBagSelect = (bagId: string) => {
     setSelectedKnownBag(bagId);
     if (bagId) {
-      // Clear manual dimensions and user bag selection when selecting known bag
-      setDimensions({ length: "", width: "", height: "" });
+      // Fill manual dimensions with selected bag dimensions
+      const knownBag = knownBags.find((kb: KnownBag) => kb.id === bagId);
+      if (knownBag) {
+        const lengthInUnit = unit === "cm" ? parseFloat(knownBag.lengthCm) : cmToInches(parseFloat(knownBag.lengthCm));
+        const widthInUnit = unit === "cm" ? parseFloat(knownBag.widthCm) : cmToInches(parseFloat(knownBag.widthCm));
+        const heightInUnit = unit === "cm" ? parseFloat(knownBag.heightCm) : cmToInches(parseFloat(knownBag.heightCm));
+        
+        setDimensions({ 
+          length: lengthInUnit.toFixed(1), 
+          width: widthInUnit.toFixed(1), 
+          height: heightInUnit.toFixed(1) 
+        });
+        setIsPetCarrier(knownBag.isPetCarrier);
+      }
       setSelectedUserBag("");
     }
   };
@@ -202,19 +179,50 @@ export default function BagCheckForm() {
   const handleUserBagSelect = (bagId: string) => {
     setSelectedUserBag(bagId);
     if (bagId) {
-      // Clear manual dimensions and known bag selection when selecting a saved bag
-      setDimensions({ length: "", width: "", height: "" });
+      // Fill manual dimensions with selected user bag dimensions
+      const userBag = userBags.find((ub: UserBag) => ub.id === bagId);
+      if (userBag) {
+        const lengthInUnit = unit === "cm" ? parseFloat(userBag.bag.lengthCm) : cmToInches(parseFloat(userBag.bag.lengthCm));
+        const widthInUnit = unit === "cm" ? parseFloat(userBag.bag.widthCm) : cmToInches(parseFloat(userBag.bag.widthCm));
+        const heightInUnit = unit === "cm" ? parseFloat(userBag.bag.heightCm) : cmToInches(parseFloat(userBag.bag.heightCm));
+        
+        setDimensions({ 
+          length: lengthInUnit.toFixed(1), 
+          width: widthInUnit.toFixed(1), 
+          height: heightInUnit.toFixed(1) 
+        });
+        setIsPetCarrier(userBag.bag.isPetCarrier);
+      }
       setSelectedKnownBag("");
     }
   };
 
   const handleManualDimensionChange = (field: string, value: string) => {
     setDimensions(prev => ({ ...prev, [field]: value }));
-    if (value) {
-      // Clear selected bags when entering manual dimensions
-      setSelectedUserBag("");
-      setSelectedKnownBag("");
+    // Don't clear selections when manually editing - allow users to modify pre-filled values
+  };
+
+  const handleUnitChange = (newUnit: "in" | "cm") => {
+    // Convert existing dimensions to new unit
+    if (dimensions.length || dimensions.width || dimensions.height) {
+      const convertValue = (value: string, fromUnit: "in" | "cm", toUnit: "in" | "cm") => {
+        if (!value) return "";
+        const numValue = parseFloat(value);
+        if (fromUnit === "cm" && toUnit === "in") {
+          return cmToInches(numValue).toFixed(1);
+        } else if (fromUnit === "in" && toUnit === "cm") {
+          return inchesToCm(numValue).toFixed(1);
+        }
+        return value;
+      };
+
+      setDimensions(prev => ({
+        length: convertValue(prev.length, unit, newUnit),
+        width: convertValue(prev.width, unit, newUnit),
+        height: convertValue(prev.height, unit, newUnit),
+      }));
     }
+    setUnit(newUnit);
   };
 
   return (
@@ -327,7 +335,7 @@ export default function BagCheckForm() {
                       className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
                         unit === "in" ? "bg-airline-blue text-white" : "text-gray-600 hover:text-gray-800"
                       }`}
-                      onClick={() => setUnit("in")}
+                      onClick={() => handleUnitChange("in")}
                       data-testid="button-unit-inches"
                     >
                       Inches
@@ -337,7 +345,7 @@ export default function BagCheckForm() {
                       className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
                         unit === "cm" ? "bg-airline-blue text-white" : "text-gray-600 hover:text-gray-800"
                       }`}
-                      onClick={() => setUnit("cm")}
+                      onClick={() => handleUnitChange("cm")}
                       data-testid="button-unit-cm"
                     >
                       CM
