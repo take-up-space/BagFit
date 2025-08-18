@@ -280,7 +280,23 @@ export default function BagCheckForm() {
               
               {/* Select from Known Bags Database */}
               <div className="mb-6">
-                <Label htmlFor="knownBag">Select from Popular Bag Models</Label>
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="knownBag">Select from Popular Bag Models</Label>
+                  {selectedKnownBag && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedKnownBag("");
+                        setDimensions({ length: "", width: "", height: "" });
+                        setIsPetCarrier(false);
+                      }}
+                      className="text-sm text-gray-500 hover:text-gray-700 underline"
+                      data-testid="button-clear-known-bag"
+                    >
+                      Clear selection
+                    </button>
+                  )}
+                </div>
                 <Select value={selectedKnownBag} onValueChange={handleKnownBagSelect}>
                   <SelectTrigger data-testid="select-known-bag">
                     <SelectValue placeholder="Choose from 80+ popular bag models..." />
@@ -306,7 +322,23 @@ export default function BagCheckForm() {
                 <>
                   <div className="text-center text-gray-500 text-sm mb-4">or</div>
                   <div className="mb-6">
-                    <Label htmlFor="userBag">Select from My Bags</Label>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label htmlFor="userBag">Select from My Bags</Label>
+                      {selectedUserBag && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedUserBag("");
+                            setDimensions({ length: "", width: "", height: "" });
+                            setIsPetCarrier(false);
+                          }}
+                          className="text-sm text-gray-500 hover:text-gray-700 underline"
+                          data-testid="button-clear-user-bag"
+                        >
+                          Clear selection
+                        </button>
+                      )}
+                    </div>
                     <Select value={selectedUserBag} onValueChange={handleUserBagSelect}>
                       <SelectTrigger data-testid="select-user-bag">
                         <SelectValue placeholder="Select from My Bags..." />

@@ -267,9 +267,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           bagId: checkData.bagId,
           airlineId: airline.id,
           flightNumber: checkData.flightNumber,
-          bagLengthCm: checkData.bagLengthCm,
-          bagWidthCm: checkData.bagWidthCm,
-          bagHeightCm: checkData.bagHeightCm,
+          bagLengthCm: checkData.bagLengthCm.toString(),
+          bagWidthCm: checkData.bagWidthCm.toString(),
+          bagHeightCm: checkData.bagHeightCm.toString(),
           isPetCarrier: checkData.isPetCarrier,
           fitsUnderSeat,
         });
