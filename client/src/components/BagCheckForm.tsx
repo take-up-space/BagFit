@@ -30,6 +30,17 @@ interface UserBag {
   };
 }
 
+interface KnownBag {
+  id: string;
+  brand: string;
+  model: string;
+  lengthCm: string;
+  widthCm: string;
+  heightCm: string;
+  isPetCarrier: boolean;
+  isVerified: boolean;
+}
+
 function cmToInches(cm: number): number {
   return Math.round(cm / 2.54 * 100) / 100;
 }
@@ -49,6 +60,7 @@ export default function BagCheckForm() {
     height: "",
   });
   const [selectedUserBag, setSelectedUserBag] = useState("");
+  const [selectedKnownBag, setSelectedKnownBag] = useState("");
   const [isPetCarrier, setIsPetCarrier] = useState(false);
   const [checkResult, setCheckResult] = useState<any>(null);
 
@@ -63,6 +75,12 @@ export default function BagCheckForm() {
     queryKey: ["/api/user/bags"],
     retry: false,
     meta: { on401: "returnNull" },
+  });
+
+  // Fetch all known bags from database
+  const { data: knownBags = [] } = useQuery<KnownBag[]>({
+    queryKey: ["/api/bags"],
+    retry: false,
   });
 
   // Bag check mutation
@@ -105,7 +123,22 @@ export default function BagCheckForm() {
 
     let bagLengthCm, bagWidthCm, bagHeightCm;
 
-    if (selectedUserBag) {
+    if (selectedKnownBag) {
+      // Use selected known bag dimensions
+      const knownBag = knownBags.find((kb: KnownBag) => kb.id === selectedKnownBag);
+      if (!knownBag) {
+        toast({
+          title: "Error",
+          description: "Selected bag not found.",
+          variant: "destructive",
+        });
+        return;
+      }
+      bagLengthCm = parseFloat(knownBag.lengthCm);
+      bagWidthCm = parseFloat(knownBag.widthCm);
+      bagHeightCm = parseFloat(knownBag.heightCm);
+      setIsPetCarrier(knownBag.isPetCarrier);
+    } else if (selectedUserBag) {
       // Use selected user bag dimensions
       const userBag = userBags.find((ub: UserBag) => ub.id === selectedUserBag);
       if (!userBag) {
@@ -153,23 +186,34 @@ export default function BagCheckForm() {
       bagWidthCm,
       bagHeightCm,
       isPetCarrier,
-      bagId: selectedUserBag || undefined,
+      bagId: selectedKnownBag || selectedUserBag || undefined,
     });
+  };
+
+  const handleKnownBagSelect = (bagId: string) => {
+    setSelectedKnownBag(bagId);
+    if (bagId) {
+      // Clear manual dimensions and user bag selection when selecting known bag
+      setDimensions({ length: "", width: "", height: "" });
+      setSelectedUserBag("");
+    }
   };
 
   const handleUserBagSelect = (bagId: string) => {
     setSelectedUserBag(bagId);
     if (bagId) {
-      // Clear manual dimensions when selecting a saved bag
+      // Clear manual dimensions and known bag selection when selecting a saved bag
       setDimensions({ length: "", width: "", height: "" });
+      setSelectedKnownBag("");
     }
   };
 
   const handleManualDimensionChange = (field: string, value: string) => {
     setDimensions(prev => ({ ...prev, [field]: value }));
     if (value) {
-      // Clear selected user bag when entering manual dimensions
+      // Clear selected bags when entering manual dimensions
       setSelectedUserBag("");
+      setSelectedKnownBag("");
     }
   };
 
@@ -223,8 +267,55 @@ export default function BagCheckForm() {
             <div>
               <h3 className="text-lg font-medium text-gray-800 mb-4 flex items-center">
                 <span className="bg-airline-blue text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">2</span>
-                Enter Bag Dimensions
+                Choose Your Bag
               </h3>
+              
+              {/* Select from Known Bags Database */}
+              <div className="mb-6">
+                <Label htmlFor="knownBag">Select from Popular Bag Models</Label>
+                <Select value={selectedKnownBag} onValueChange={handleKnownBagSelect}>
+                  <SelectTrigger data-testid="select-known-bag">
+                    <SelectValue placeholder="Choose from 80+ popular bag models..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {knownBags.map((bag: KnownBag) => (
+                      <SelectItem key={bag.id} value={bag.id} data-testid={`option-known-bag-${bag.id}`}>
+                        <div className="flex items-center justify-between w-full">
+                          <span>{bag.brand} {bag.model}</span>
+                          <span className="text-sm text-gray-500 ml-2">
+                            ({cmToInches(parseFloat(bag.lengthCm))}×{cmToInches(parseFloat(bag.widthCm))}×{cmToInches(parseFloat(bag.heightCm))}")
+                            {bag.isVerified && <span className="text-verified-blue ml-1">✓</span>}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Alternative: Select from My Bags */}
+              {userBags.length > 0 && (
+                <>
+                  <div className="text-center text-gray-500 text-sm mb-4">or</div>
+                  <div className="mb-6">
+                    <Label htmlFor="userBag">Select from My Bags</Label>
+                    <Select value={selectedUserBag} onValueChange={handleUserBagSelect}>
+                      <SelectTrigger data-testid="select-user-bag">
+                        <SelectValue placeholder="Select from My Bags..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {userBags.map((userBag: UserBag) => (
+                          <SelectItem key={userBag.id} value={userBag.id} data-testid={`option-user-bag-${userBag.id}`}>
+                            {userBag.customName} ({cmToInches(parseFloat(userBag.bag.lengthCm))}×{cmToInches(parseFloat(userBag.bag.widthCm))}×{cmToInches(parseFloat(userBag.bag.heightCm))}")
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              )}
+
+              <div className="text-center text-gray-500 text-sm mb-4">or enter manually</div>
               
               {/* Unit Toggle */}
               <div className="flex justify-between items-center mb-4">
@@ -308,30 +399,6 @@ export default function BagCheckForm() {
                   />
                 </div>
               </div>
-
-              {/* Alternative: Select from My Bags */}
-              {userBags.length > 0 && (
-                <>
-                  <div className="text-center text-gray-500 text-sm mb-4">or</div>
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-1">
-                      <Label htmlFor="userBag">Select from My Bags</Label>
-                      <Select value={selectedUserBag} onValueChange={handleUserBagSelect}>
-                        <SelectTrigger data-testid="select-user-bag">
-                          <SelectValue placeholder="Select from My Bags..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {userBags.map((userBag: UserBag) => (
-                            <SelectItem key={userBag.id} value={userBag.id} data-testid={`option-user-bag-${userBag.id}`}>
-                              {userBag.customName} ({cmToInches(parseFloat(userBag.bag.lengthCm))}×{cmToInches(parseFloat(userBag.bag.widthCm))}×{cmToInches(parseFloat(userBag.bag.heightCm))}")
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </>
-              )}
             </div>
 
             {/* Check Button */}

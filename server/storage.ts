@@ -31,6 +31,7 @@ export interface IStorage {
   updateAirline(id: string, airline: Partial<InsertAirline>): Promise<Airline>;
   
   // Bag operations
+  getAllBags(): Promise<Bag[]>;
   getBagById(id: string): Promise<Bag | undefined>;
   searchBagsByBrand(brand: string): Promise<Bag[]>;
   createBag(bag: InsertBag): Promise<Bag>;
@@ -98,6 +99,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Bag operations
+  async getAllBags(): Promise<Bag[]> {
+    return await db.select().from(bags).orderBy(bags.brand, bags.model);
+  }
+
   async getBagById(id: string): Promise<Bag | undefined> {
     const [bag] = await db.select().from(bags).where(eq(bags.id, id));
     return bag;

@@ -68,6 +68,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all bags route (public)
+  app.get('/api/bags', async (req, res) => {
+    try {
+      const bags = await storage.getAllBags();
+      res.json(bags);
+    } catch (error) {
+      console.error("Error fetching bags:", error);
+      res.status(500).json({ message: "Failed to fetch bags" });
+    }
+  });
+
   app.get('/api/airlines/:iataCode', async (req, res) => {
     try {
       const { iataCode } = req.params;
