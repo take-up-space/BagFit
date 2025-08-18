@@ -6,7 +6,7 @@ import Sidebar from "@/components/Sidebar";
 import AirlineReference from "@/components/AirlineReference";
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -20,33 +20,54 @@ export default function Home() {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Link 
-                href="/my-bags"
-                className="text-gray-600 hover:text-airline-blue transition-colors"
-                data-testid="link-my-bags"
-              >
-                <i className="fas fa-suitcase mr-1"></i>My Bags
-              </Link>
-              <div className="flex items-center space-x-2">
-                {user?.profileImageUrl && (
-                  <img 
-                    src={user.profileImageUrl} 
-                    alt="Profile" 
-                    className="w-8 h-8 rounded-full object-cover"
-                    data-testid="img-profile"
-                  />
-                )}
-                <span className="text-gray-700" data-testid="text-username">
-                  {user?.firstName || user?.email || 'User'}
-                </span>
-              </div>
-              <a 
-                href="/api/logout"
-                className="text-gray-600 hover:text-red-600 transition-colors"
-                data-testid="button-logout"
-              >
-                <i className="fas fa-sign-out-alt mr-1"></i>Logout
-              </a>
+              {isAuthenticated ? (
+                <>
+                  <Link 
+                    href="/my-bags"
+                    className="text-gray-600 hover:text-airline-blue transition-colors"
+                    data-testid="link-my-bags"
+                  >
+                    <i className="fas fa-suitcase mr-1"></i>My Bags
+                  </Link>
+                  <div className="flex items-center space-x-2">
+                    {user?.profileImageUrl && (
+                      <img 
+                        src={user.profileImageUrl} 
+                        alt="Profile" 
+                        className="w-8 h-8 rounded-full object-cover"
+                        data-testid="img-profile"
+                      />
+                    )}
+                    <span className="text-gray-700" data-testid="text-username">
+                      {user?.firstName || user?.email || 'User'}
+                    </span>
+                  </div>
+                  <a 
+                    href="/api/logout"
+                    className="text-gray-600 hover:text-red-600 transition-colors"
+                    data-testid="button-logout"
+                  >
+                    <i className="fas fa-sign-out-alt mr-1"></i>Logout
+                  </a>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    href="/"
+                    className="text-gray-600 hover:text-airline-blue transition-colors"
+                    data-testid="link-home"
+                  >
+                    <i className="fas fa-home mr-1"></i>Home
+                  </Link>
+                  <a 
+                    href="/api/login"
+                    className="bg-airline-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    data-testid="button-login"
+                  >
+                    <i className="fas fa-user mr-1"></i>Login
+                  </a>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -62,6 +83,11 @@ export default function Home() {
           <p className="text-xl text-gray-600 mb-6 max-w-2xl mx-auto">
             Check your bag dimensions against airline underseat space requirements. 
             Avoid surprises at the gate with verified airline data.
+            {!isAuthenticated && (
+              <span className="block mt-2 text-sm text-blue-600">
+                💡 <a href="/api/login" className="underline hover:text-blue-800">Create a free account</a> to save your bags for future trips!
+              </span>
+            )}
           </p>
           <div className="flex justify-center items-center space-x-8 text-sm text-gray-500">
             <div className="flex items-center">

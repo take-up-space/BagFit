@@ -14,14 +14,13 @@ function Router() {
 
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <>
-          <Route path="/" component={Home} />
-          <Route path="/my-bags" component={MyBags} />
-        </>
-      )}
+      <Route path="/" component={Landing} />
+      <Route path="/check-bag">
+        {isLoading ? <div>Loading...</div> : <Home />}
+      </Route>
+      <Route path="/my-bags">
+        {isAuthenticated ? <MyBags /> : <Landing />}
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );

@@ -53,14 +53,24 @@ export default function Landing() {
             </div>
           </div>
 
-          <a 
-            href="/api/login"
-            className="bg-airline-blue text-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors inline-flex items-center"
-            data-testid="button-get-started"
-          >
-            <i className="fas fa-rocket mr-2"></i>
-            Get Started - It's Free
-          </a>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link 
+              href="/check-bag"
+              className="bg-airline-blue text-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors inline-flex items-center"
+              data-testid="button-try-guest"
+            >
+              <i className="fas fa-search mr-2"></i>
+              Try as Guest
+            </Link>
+            <a 
+              href="/api/login"
+              className="bg-white text-airline-blue border-2 border-airline-blue px-8 py-4 rounded-lg text-lg font-medium hover:bg-airline-blue hover:text-white transition-colors inline-flex items-center"
+              data-testid="button-get-started"
+            >
+              <i className="fas fa-user-plus mr-2"></i>
+              Create Account
+            </a>
+          </div>
         </div>
 
         {/* Feature Cards */}
@@ -141,14 +151,24 @@ export default function Landing() {
           <p className="text-xl mb-8 opacity-90">
             Join thousands of travelers who check their bags before heading to the airport.
           </p>
-          <a 
-            href="/api/login"
-            className="bg-white text-airline-blue px-8 py-4 rounded-lg text-lg font-medium hover:bg-gray-100 transition-colors inline-flex items-center"
-            data-testid="button-join-now"
-          >
-            <i className="fas fa-user-plus mr-2"></i>
-            Join Now - Free Account
-          </a>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link 
+              href="/check-bag"
+              className="bg-white text-airline-blue px-8 py-4 rounded-lg text-lg font-medium hover:bg-gray-100 transition-colors inline-flex items-center"
+              data-testid="button-try-now"
+            >
+              <i className="fas fa-search mr-2"></i>
+              Try It Now
+            </Link>
+            <a 
+              href="/api/login"
+              className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-white hover:text-airline-blue transition-colors inline-flex items-center"
+              data-testid="button-join-now"
+            >
+              <i className="fas fa-user-plus mr-2"></i>
+              Create Account
+            </a>
+          </div>
         </div>
       </main>
 
@@ -164,7 +184,7 @@ export default function Landing() {
             <div>
               <h4 className="font-medium text-gray-900 mb-4">Tools</h4>
               <ul className="space-y-2">
-                <li><Link href="/" className="text-gray-600 hover:text-airline-blue transition-colors">Bag Size Checker</Link></li>
+                <li><Link href="/check-bag" className="text-gray-600 hover:text-airline-blue transition-colors">Bag Size Checker</Link></li>
                 <li><span className="text-gray-400">My Bags (Login Required)</span></li>
                 <li><span className="text-gray-400">Travel Tips</span></li>
               </ul>

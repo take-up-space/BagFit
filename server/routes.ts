@@ -127,7 +127,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create bag route
   app.post('/api/bags', async (req, res) => {
     try {
-      const bagData = insertBagSchema.parse(req.body);
+      // Transform numeric inputs to strings for decimal fields
+      const transformedBody = {
+        ...req.body,
+        lengthCm: typeof req.body.lengthCm === 'number' ? req.body.lengthCm.toString() : req.body.lengthCm,
+        widthCm: typeof req.body.widthCm === 'number' ? req.body.widthCm.toString() : req.body.widthCm,
+        heightCm: typeof req.body.heightCm === 'number' ? req.body.heightCm.toString() : req.body.heightCm,
+      };
+      
+      const bagData = insertBagSchema.parse(transformedBody);
       const bag = await storage.createBag(bagData);
       res.status(201).json(bag);
     } catch (error) {
