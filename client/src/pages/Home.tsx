@@ -7,6 +7,7 @@ import AirlineReference from "@/components/AirlineReference";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
+  const [selectedAirlineCode, setSelectedAirlineCode] = useState<string>("");
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -109,12 +110,12 @@ export default function Home() {
           
           {/* Main Content */}
           <div className="lg:col-span-2">
-            <BagCheckForm />
+            <BagCheckForm onAirlineSelect={setSelectedAirlineCode} />
           </div>
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Sidebar />
+            <Sidebar selectedAirlineCode={selectedAirlineCode} />
           </div>
         </div>
 

@@ -9,6 +9,7 @@ interface ResultsDisplayProps {
   result: {
     fitsUnderSeat: boolean;
     exceedsIn: string[];
+    isPetCarrier: boolean;
     airline: {
       name: string;
       iataCode: string;
@@ -18,6 +19,9 @@ interface ResultsDisplayProps {
       maxPersonalItemWidthCm: string;
       maxPersonalItemHeightCm: string;
       petCarrierAllowed: boolean;
+      petCarrierMaxLengthCm?: string;
+      petCarrierMaxWidthCm?: string;
+      petCarrierMaxHeightCm?: string;
     };
     bagDimensions: {
       lengthCm: number;
@@ -146,8 +150,8 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
               <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center">
                 {result.isPetCarrier && result.airline.petCarrierMaxLengthCm && (
                   parseFloat(result.airline.petCarrierMaxLengthCm) !== parseFloat(result.airline.maxPersonalItemLengthCm) ||
-                  parseFloat(result.airline.petCarrierMaxWidthCm) !== parseFloat(result.airline.maxPersonalItemWidthCm) ||
-                  parseFloat(result.airline.petCarrierMaxHeightCm) !== parseFloat(result.airline.maxPersonalItemHeightCm)
+                  parseFloat(result.airline.petCarrierMaxWidthCm || '0') !== parseFloat(result.airline.maxPersonalItemWidthCm) ||
+                  parseFloat(result.airline.petCarrierMaxHeightCm || '0') !== parseFloat(result.airline.maxPersonalItemHeightCm)
                 ) ? 'Pet Carrier Limit' : 'Airline Limit'}
                 <span className="ml-2">
                   <VerificationBadge status={result.airline.verificationStatus} />

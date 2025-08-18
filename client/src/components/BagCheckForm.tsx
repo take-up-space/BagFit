@@ -49,7 +49,11 @@ function inchesToCm(inches: number): number {
   return Math.round(inches * 2.54 * 100) / 100;
 }
 
-export default function BagCheckForm() {
+interface BagCheckFormProps {
+  onAirlineSelect?: (airlineCode: string) => void;
+}
+
+export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
   const { toast } = useToast();
   const [selectedAirline, setSelectedAirline] = useState("");
   const [flightNumber, setFlightNumber] = useState("");
@@ -202,6 +206,13 @@ export default function BagCheckForm() {
     // Don't clear selections when manually editing - allow users to modify pre-filled values
   };
 
+  const handleAirlineSelect = (airlineCode: string) => {
+    setSelectedAirline(airlineCode);
+    if (onAirlineSelect) {
+      onAirlineSelect(airlineCode);
+    }
+  };
+
   const handleUnitChange = (newUnit: "in" | "cm") => {
     // Convert existing dimensions to new unit
     if (dimensions.length || dimensions.width || dimensions.height) {
@@ -245,7 +256,7 @@ export default function BagCheckForm() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="airline">Airline *</Label>
-                  <Select value={selectedAirline} onValueChange={setSelectedAirline} required>
+                  <Select value={selectedAirline} onValueChange={handleAirlineSelect} required>
                     <SelectTrigger data-testid="select-airline">
                       <SelectValue placeholder="Choose airline..." />
                     </SelectTrigger>

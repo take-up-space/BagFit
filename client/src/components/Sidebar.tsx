@@ -21,11 +21,20 @@ function getAirlineLogoColor(iataCode: string): string {
   return colors[iataCode] || 'bg-gray-600';
 }
 
-export default function Sidebar() {
+interface SidebarProps {
+  selectedAirlineCode?: string;
+}
+
+export default function Sidebar({ selectedAirlineCode }: SidebarProps = {}) {
   const { data: airlines } = useQuery({
     queryKey: ["/api/airlines"],
     retry: false,
   });
+
+  // Filter airlines for verification status section
+  const airlinesToShow = selectedAirlineCode 
+    ? (airlines as Airline[])?.filter((airline: Airline) => airline.iataCode === selectedAirlineCode) || []
+    : (airlines as Airline[])?.slice(0, 6) || [];
 
   return (
     <div className="space-y-8">
@@ -40,7 +49,7 @@ export default function Sidebar() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {airlines?.slice(0, 6).map((airline: Airline) => (
+            {airlinesToShow.map((airline: Airline) => (
               <div 
                 key={airline.id}
                 className={`flex items-center justify-between p-3 rounded-lg border ${
