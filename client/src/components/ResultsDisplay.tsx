@@ -115,7 +115,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
               ? `Your bag meets ${result.airline.name} underseat requirements`
               : (result.exceedsIn.includes('Pet carriers not allowed') 
                   ? `${result.airline.name} does not allow pet carriers in the cabin`
-                  : `Your bag exceeds limits in: ${result.exceedsIn.join(', ')}`
+                  : `Your bag exceeds ${result.isPetCarrier ? 'pet carrier' : ''} limits in: ${result.exceedsIn.join(', ')}`
                 )
             }
           </p>
@@ -144,7 +144,11 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
             </div>
             <div>
               <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center">
-                Airline Limit
+                {result.isPetCarrier && result.airline.petCarrierMaxLengthCm && (
+                  parseFloat(result.airline.petCarrierMaxLengthCm) !== parseFloat(result.airline.maxPersonalItemLengthCm) ||
+                  parseFloat(result.airline.petCarrierMaxWidthCm) !== parseFloat(result.airline.maxPersonalItemWidthCm) ||
+                  parseFloat(result.airline.petCarrierMaxHeightCm) !== parseFloat(result.airline.maxPersonalItemHeightCm)
+                ) ? 'Pet Carrier Limit' : 'Airline Limit'}
                 <span className="ml-2">
                   <VerificationBadge status={result.airline.verificationStatus} />
                 </span>
@@ -153,28 +157,46 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                 <div className="flex justify-between" data-testid="text-airline-limit-length">
                   <span>Length:</span>
                   <span className={`font-medium ${
-                    result.bagDimensions.lengthCm <= parseFloat(result.airline.maxPersonalItemLengthCm) 
-                      ? 'text-success-green' : 'text-error-red'
+                    result.bagDimensions.lengthCm <= parseFloat(
+                      result.isPetCarrier && result.airline.petCarrierMaxLengthCm 
+                        ? result.airline.petCarrierMaxLengthCm 
+                        : result.airline.maxPersonalItemLengthCm
+                    ) ? 'text-success-green' : 'text-error-red'
                   }`}>
-                    {cmToInches(parseFloat(result.airline.maxPersonalItemLengthCm))}" ({parseFloat(result.airline.maxPersonalItemLengthCm).toFixed(1)}cm)
+                    {result.isPetCarrier && result.airline.petCarrierMaxLengthCm ? 
+                      `${cmToInches(parseFloat(result.airline.petCarrierMaxLengthCm))}" (${parseFloat(result.airline.petCarrierMaxLengthCm).toFixed(1)}cm)` :
+                      `${cmToInches(parseFloat(result.airline.maxPersonalItemLengthCm))}" (${parseFloat(result.airline.maxPersonalItemLengthCm).toFixed(1)}cm)`
+                    }
                   </span>
                 </div>
                 <div className="flex justify-between" data-testid="text-airline-limit-width">
                   <span>Width:</span>
                   <span className={`font-medium ${
-                    result.bagDimensions.widthCm <= parseFloat(result.airline.maxPersonalItemWidthCm) 
-                      ? 'text-success-green' : 'text-error-red'
+                    result.bagDimensions.widthCm <= parseFloat(
+                      result.isPetCarrier && result.airline.petCarrierMaxWidthCm 
+                        ? result.airline.petCarrierMaxWidthCm 
+                        : result.airline.maxPersonalItemWidthCm
+                    ) ? 'text-success-green' : 'text-error-red'
                   }`}>
-                    {cmToInches(parseFloat(result.airline.maxPersonalItemWidthCm))}" ({parseFloat(result.airline.maxPersonalItemWidthCm).toFixed(1)}cm)
+                    {result.isPetCarrier && result.airline.petCarrierMaxWidthCm ? 
+                      `${cmToInches(parseFloat(result.airline.petCarrierMaxWidthCm))}" (${parseFloat(result.airline.petCarrierMaxWidthCm).toFixed(1)}cm)` :
+                      `${cmToInches(parseFloat(result.airline.maxPersonalItemWidthCm))}" (${parseFloat(result.airline.maxPersonalItemWidthCm).toFixed(1)}cm)`
+                    }
                   </span>
                 </div>
                 <div className="flex justify-between" data-testid="text-airline-limit-height">
                   <span>Height:</span>
                   <span className={`font-medium ${
-                    result.bagDimensions.heightCm <= parseFloat(result.airline.maxPersonalItemHeightCm) 
-                      ? 'text-success-green' : 'text-error-red'
+                    result.bagDimensions.heightCm <= parseFloat(
+                      result.isPetCarrier && result.airline.petCarrierMaxHeightCm 
+                        ? result.airline.petCarrierMaxHeightCm 
+                        : result.airline.maxPersonalItemHeightCm
+                    ) ? 'text-success-green' : 'text-error-red'
                   }`}>
-                    {cmToInches(parseFloat(result.airline.maxPersonalItemHeightCm))}" ({parseFloat(result.airline.maxPersonalItemHeightCm).toFixed(1)}cm)
+                    {result.isPetCarrier && result.airline.petCarrierMaxHeightCm ? 
+                      `${cmToInches(parseFloat(result.airline.petCarrierMaxHeightCm))}" (${parseFloat(result.airline.petCarrierMaxHeightCm).toFixed(1)}cm)` :
+                      `${cmToInches(parseFloat(result.airline.maxPersonalItemHeightCm))}" (${parseFloat(result.airline.maxPersonalItemHeightCm).toFixed(1)}cm)`
+                    }
                   </span>
                 </div>
               </div>

@@ -281,6 +281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         fitsUnderSeat,
         exceedsIn,
+        isPetCarrier: checkData.isPetCarrier,
         airline: {
           name: airline.name,
           iataCode: airline.iataCode,
