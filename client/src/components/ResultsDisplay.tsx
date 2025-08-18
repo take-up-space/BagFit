@@ -107,12 +107,16 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
           <h2 className={`text-3xl font-bold mb-2 ${
             result.fitsUnderSeat ? 'text-success-green' : 'text-error-red'
           }`} data-testid="text-result-status">
-            {result.fitsUnderSeat ? '✓ Your Bag Fits!' : '✗ Bag Too Large'}
+            {result.fitsUnderSeat ? '✓ Your Bag Fits!' : 
+             (result.exceedsIn.includes('Pet carriers not allowed') ? '✗ Pet Carriers Not Allowed' : '✗ Bag Too Large')}
           </h2>
           <p className="text-gray-600" data-testid="text-result-description">
             {result.fitsUnderSeat 
               ? `Your bag meets ${result.airline.name} underseat requirements`
-              : `Your bag exceeds limits in: ${result.exceedsIn.join(', ')}`
+              : (result.exceedsIn.includes('Pet carriers not allowed') 
+                  ? `${result.airline.name} does not allow pet carriers in the cabin`
+                  : `Your bag exceeds limits in: ${result.exceedsIn.join(', ')}`
+                )
             }
           </p>
         </div>
