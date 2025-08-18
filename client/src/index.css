@@ -62,6 +62,55 @@
   --unverified-gray: hsl(0, 0%, 46%);
 }
 
+/* Placeholder text styling */
+input::placeholder,
+textarea::placeholder {
+  color: hsl(0, 0%, 60%) !important;
+  font-style: italic !important;
+  opacity: 1 !important;
+}
+
+/* Select component placeholder styling */
+[data-placeholder] {
+  color: hsl(0, 0%, 60%) !important;
+  font-style: italic !important;
+}
+
+/* Radix Select placeholder styling - when no value is selected */
+[data-radix-select-trigger] [data-placeholder] {
+  color: hsl(0, 0%, 60%) !important;
+  font-style: italic !important;
+}
+
+/* Additional select placeholder styling for Radix UI */
+[role="combobox"][data-placeholder]:not([data-state="open"]) {
+  color: hsl(0, 0%, 60%) !important;
+  font-style: italic !important;
+}
+
+/* Override default muted foreground for placeholders */
+.placeholder\:text-muted-foreground::placeholder {
+  color: hsl(0, 0%, 60%) !important;
+  font-style: italic !important;
+}
+
+/* Dark mode placeholder text */
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: hsl(0, 0%, 50%) !important;
+  font-style: italic !important;
+}
+
+.dark [data-placeholder] {
+  color: hsl(0, 0%, 50%) !important;
+  font-style: italic !important;
+}
+
+.dark [data-radix-select-trigger] [data-placeholder] {
+  color: hsl(0, 0%, 50%) !important;
+  font-style: italic !important;
+}
+
 .dark {
   --background: hsl(0, 0%, 0%);
   --foreground: hsl(200, 6.6667%, 91.1765%);
