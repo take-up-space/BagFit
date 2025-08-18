@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import airplaneSeatIcon from "@assets/generated_images/airplane_seat_side_view_178d3b13.png";
+import airplaneSeatIcon from "@assets/generated_images/blue_airplane_seat_icon_ff94725c.png";
 
 export default function Landing() {
   return (
