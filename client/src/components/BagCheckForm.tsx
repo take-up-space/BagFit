@@ -67,6 +67,10 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
   const [selectedKnownBag, setSelectedKnownBag] = useState("");
   const [isPetCarrier, setIsPetCarrier] = useState(false);
   const [checkResult, setCheckResult] = useState<any>(null);
+  const [validationErrors, setValidationErrors] = useState<{
+    airline?: string;
+    dimensions?: string;
+  }>({});
 
   // Fetch airlines
   const { data: airlines = [] } = useQuery<Airline[]>({
@@ -113,29 +117,44 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
     },
   });
 
+  const validateForm = () => {
+    const errors: { airline?: string; dimensions?: string } = {};
+
+    // Validate airline selection
+    if (!selectedAirline) {
+      errors.airline = "Please select an airline";
+    }
+
+    // Validate bag dimensions - check if user has either selected a bag OR entered all dimensions
+    const hasDimensions = dimensions.length && dimensions.width && dimensions.height;
+    const hasSelectedBag = selectedKnownBag || selectedUserBag;
+    
+    if (!hasDimensions && !hasSelectedBag) {
+      errors.dimensions = "Please enter all bag dimensions or select a bag from the dropdown";
+    } else if (hasDimensions) {
+      // Validate dimension values are positive numbers
+      const length = parseFloat(dimensions.length);
+      const width = parseFloat(dimensions.width);
+      const height = parseFloat(dimensions.height);
+      
+      if (isNaN(length) || length <= 0 || isNaN(width) || width <= 0 || isNaN(height) || height <= 0) {
+        errors.dimensions = "All dimensions must be positive numbers";
+      }
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedAirline) {
-      toast({
-        title: "Error",
-        description: "Please select an airline.",
-        variant: "destructive",
-      });
+    // Validate form and show errors
+    if (!validateForm()) {
       return;
     }
 
     let bagLengthCm, bagWidthCm, bagHeightCm;
-
-    // Always use manual dimensions (which may be pre-filled from bag selection)
-    if (!dimensions.length || !dimensions.width || !dimensions.height) {
-      toast({
-        title: "Missing Information",
-        description: "Please enter all bag dimensions or select a bag from the list.",
-        variant: "destructive",
-      });
-      return;
-    }
 
     // Convert dimensions to cm for API call
     if (unit === "in") {
@@ -147,6 +166,9 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
       bagWidthCm = parseFloat(dimensions.width);
       bagHeightCm = parseFloat(dimensions.height);
     }
+
+    // Clear any validation errors on successful submission
+    setValidationErrors({});
 
     checkBagMutation.mutate({
       airlineIataCode: selectedAirline,
@@ -177,6 +199,10 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
         setIsPetCarrier(knownBag.isPetCarrier);
       }
       setSelectedUserBag("");
+      // Clear dimension errors when user selects a bag
+      if (validationErrors.dimensions) {
+        setValidationErrors(prev => ({ ...prev, dimensions: undefined }));
+      }
     }
   };
 
@@ -198,18 +224,29 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
         setIsPetCarrier(userBag.bag.isPetCarrier);
       }
       setSelectedKnownBag("");
+      // Clear dimension errors when user selects a bag
+      if (validationErrors.dimensions) {
+        setValidationErrors(prev => ({ ...prev, dimensions: undefined }));
+      }
     }
   };
 
   const handleManualDimensionChange = (field: string, value: string) => {
     setDimensions(prev => ({ ...prev, [field]: value }));
-    // Don't clear selections when manually editing - allow users to modify pre-filled values
+    // Clear dimension errors when user starts entering values
+    if (validationErrors.dimensions && value) {
+      setValidationErrors(prev => ({ ...prev, dimensions: undefined }));
+    }
   };
 
   const handleAirlineSelect = (airlineCode: string) => {
     setSelectedAirline(airlineCode);
     if (onAirlineSelect) {
       onAirlineSelect(airlineCode);
+    }
+    // Clear airline error when user selects
+    if (validationErrors.airline) {
+      setValidationErrors(prev => ({ ...prev, airline: undefined }));
     }
   };
 
@@ -257,7 +294,10 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                 <div>
                   <Label htmlFor="airline">Airline *</Label>
                   <Select value={selectedAirline} onValueChange={handleAirlineSelect} required>
-                    <SelectTrigger data-testid="select-airline">
+                    <SelectTrigger 
+                      data-testid="select-airline"
+                      className={validationErrors.airline ? "border-error-red" : ""}
+                    >
                       <SelectValue placeholder="Choose airline..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -268,6 +308,12 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                       ))}
                     </SelectContent>
                   </Select>
+                  {validationErrors.airline && (
+                    <p className="text-sm text-error-red mt-1" data-testid="error-airline">
+                      <i className="fas fa-exclamation-circle mr-1"></i>
+                      {validationErrors.airline}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="flightNumber">Flight Number (optional)</Label>
@@ -419,7 +465,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                     value={dimensions.length}
                     onChange={(e) => handleManualDimensionChange("length", e.target.value)}
                     placeholder={unit === "in" ? "18" : "45.7"}
-                    className="text-center"
+                    className={`text-center ${validationErrors.dimensions ? "border-error-red" : ""}`}
                     data-testid="input-length"
                   />
                 </div>
@@ -432,7 +478,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                     value={dimensions.width}
                     onChange={(e) => handleManualDimensionChange("width", e.target.value)}
                     placeholder={unit === "in" ? "14" : "35.6"}
-                    className="text-center"
+                    className={`text-center ${validationErrors.dimensions ? "border-error-red" : ""}`}
                     data-testid="input-width"
                   />
                 </div>
@@ -445,11 +491,19 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                     value={dimensions.height}
                     onChange={(e) => handleManualDimensionChange("height", e.target.value)}
                     placeholder={unit === "in" ? "8" : "20.3"}
-                    className="text-center"
+                    className={`text-center ${validationErrors.dimensions ? "border-error-red" : ""}`}
                     data-testid="input-height"
                   />
                 </div>
               </div>
+              {validationErrors.dimensions && (
+                <div className="mb-4">
+                  <p className="text-sm text-error-red" data-testid="error-dimensions">
+                    <i className="fas fa-exclamation-circle mr-1"></i>
+                    {validationErrors.dimensions}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Check Button */}
