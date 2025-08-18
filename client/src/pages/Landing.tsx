@@ -31,7 +31,7 @@ export default function Landing() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Will Your Bag Fit Under the Seat?
+            Will Your Bag Fit Under the Seat in Front of You?
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
             Check your bag dimensions against airline underseat space requirements. 
