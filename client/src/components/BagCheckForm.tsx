@@ -315,16 +315,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                     </p>
                   )}
                 </div>
-                <div>
-                  <Label htmlFor="flightNumber">Flight Number (optional)</Label>
-                  <Input
-                    id="flightNumber"
-                    value={flightNumber}
-                    onChange={(e) => setFlightNumber(e.target.value)}
-                    placeholder="AA123"
-                    data-testid="input-flight-number"
-                  />
-                </div>
+                
               </div>
             </div>
 
