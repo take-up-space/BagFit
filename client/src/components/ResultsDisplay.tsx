@@ -14,6 +14,7 @@ interface ResultsDisplayProps {
       name: string;
       iataCode: string;
       verificationStatus: string;
+      lastVerifiedDate?: string;
       sourceUrl?: string;
       maxPersonalItemLengthCm: string;
       maxPersonalItemWidthCm: string;
@@ -209,15 +210,24 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
           </div>
         </div>
 
-        {/* Verification Warning */}
-        {result.airline.verificationStatus === 'UNVERIFIED_CONSERVATIVE' && (
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
+        {/* Data Verification Status */}
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+          <div className="flex items-start justify-between">
             <div className="flex items-start space-x-3">
-              <i className="fas fa-exclamation-triangle text-warning-orange mt-0.5"></i>
+              <i className={`fas ${
+                result.airline.verificationStatus === 'VERIFIED_OFFICIAL' ? 'fa-shield-check text-verified-blue' :
+                result.airline.verificationStatus === 'UNVERIFIED_CONSERVATIVE' ? 'fa-exclamation-triangle text-warning-orange' :
+                'fa-question-circle text-gray-500'
+              } mt-0.5`}></i>
               <div>
-                <p className="font-medium text-orange-800 mb-1">Unverified Dimensions</p>
-                <p className="text-sm text-orange-700">
-                  These dimensions are conservative estimates. Please verify with {result.airline.name} directly before traveling.
+                <p className="font-medium text-gray-800 mb-1">Data Verification Status</p>
+                <p className="text-sm text-gray-600">
+                  {result.airline.verificationStatus === 'VERIFIED_OFFICIAL' ? 
+                    `Verified official data from ${result.airline.name}` :
+                    result.airline.verificationStatus === 'UNVERIFIED_CONSERVATIVE' ?
+                    `Conservative estimates - verify with ${result.airline.name} before traveling` :
+                    'Data needs review - please verify independently'
+                  }
                   {result.airline.sourceUrl && (
                     <>
                       {" "}
@@ -235,8 +245,16 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                 </p>
               </div>
             </div>
+            {result.airline.lastVerifiedDate && (
+              <div className="text-right">
+                <p className="text-xs text-gray-500 mb-1">Last Verified</p>
+                <p className="text-sm font-medium text-gray-700" data-testid="text-last-verified">
+                  {new Date(result.airline.lastVerifiedDate).toLocaleDateString()}
+                </p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">

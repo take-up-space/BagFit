@@ -306,6 +306,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: airline.name,
           iataCode: airline.iataCode,
           verificationStatus: airline.verificationStatus,
+          lastVerifiedDate: airline.lastVerifiedDate,
           sourceUrl: airline.sourceUrl,
           maxPersonalItemLengthCm: airline.maxPersonalItemLengthCm,
           maxPersonalItemWidthCm: airline.maxPersonalItemWidthCm,
@@ -367,7 +368,7 @@ async function initializeAirlineData() {
           maxPersonalItemHeightCm: "20.32", // 8 inches
           verificationStatus: "VERIFIED_OFFICIAL" as const,
           sourceUrl: "https://www.aa.com/i18n/travel-info/baggage/carry-on-baggage.jsp",
-          lastVerifiedDate: new Date(),
+          lastVerifiedDate: new Date("2024-08-19"),
           petCarrierAllowed: true,
           petCarrierMaxLengthCm: "45.72",
           petCarrierMaxWidthCm: "35.56", 
@@ -451,6 +452,180 @@ async function initializeAirlineData() {
       }
 
       console.log("Initialized airline data with verified dimensions");
+    }
+
+    // Initialize popular bag models including pet carriers
+    const bags = await storage.getAllBags();
+    if (bags.length === 0) {
+      const bagData = [
+        // Pet Carriers from CSV
+        {
+          brand: "Sherpa",
+          model: "Original Deluxe Pet Carrier - Small",
+          lengthCm: "38.1",
+          widthCm: "25.4", 
+          heightCm: "20.3",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "Sherpa",
+          model: "Original Deluxe Pet Carrier - Medium",
+          lengthCm: "43.2",
+          widthCm: "27.9",
+          heightCm: "26.7",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "Sherpa",
+          model: "Original Deluxe Pet Carrier - Large",
+          lengthCm: "48.3",
+          widthCm: "29.8",
+          heightCm: "29.2",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "JetBlue",
+          model: "JetPaws Official Pet Carrier",
+          lengthCm: "40.6",
+          widthCm: "25.4",
+          heightCm: "29.2",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "Roverlund",
+          model: "Out-of-Office Pet Carrier - Small",
+          lengthCm: "43.2",
+          widthCm: "27.9",
+          heightCm: "26.7",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "Roverlund",
+          model: "Out-of-Office Pet Carrier - Large",
+          lengthCm: "47.0",
+          widthCm: "29.8",
+          heightCm: "29.2",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "Maxbone",
+          model: "All-In-One Travel Carrier",
+          lengthCm: "47.0",
+          widthCm: "24.1",
+          heightCm: "27.9",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "Mr. Peanut's",
+          model: "Gold Series Airline-Approved Soft-Sided Carrier",
+          lengthCm: "45.7",
+          widthCm: "26.7",
+          heightCm: "26.7",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "SturdiBag",
+          model: "Pro 2.0 - Cube",
+          lengthCm: "30.5",
+          widthCm: "30.5",
+          heightCm: "28.5",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "SturdiBag",
+          model: "Pro 2.0 - Small",
+          lengthCm: "46.0",
+          widthCm: "25.5",
+          heightCm: "23.5",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "SturdiBag",
+          model: "Pro 2.0 - Medium",
+          lengthCm: "38.0",
+          widthCm: "30.5",
+          heightCm: "30.0",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "SturdiBag",
+          model: "Pro 2.0 - Large",
+          lengthCm: "46.0",
+          widthCm: "29.0",
+          heightCm: "29.0",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "Away",
+          model: "The Pet Carrier",
+          lengthCm: "47.5",
+          widthCm: "27.4",
+          heightCm: "27.3",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "Sleepypod",
+          model: "Air",
+          lengthCm: "55.9",
+          widthCm: "26.7",
+          heightCm: "26.7",
+          isPetCarrier: true,
+          carrierType: "hard-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "Petsfit",
+          model: "Expandable Travel Dog Carrier - Small",
+          lengthCm: "40.6",
+          widthCm: "24.1",
+          heightCm: "27.9",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+        {
+          brand: "Petsfit",
+          model: "Expandable Travel Dog Carrier - Medium",
+          lengthCm: "50.8",
+          widthCm: "29.2",
+          heightCm: "31.8",
+          isPetCarrier: true,
+          carrierType: "soft-sided" as const,
+          isVerified: true,
+        },
+      ];
+
+      for (const bag of bagData) {
+        await storage.createBag(bag);
+      }
+
+      console.log("Initialized popular bag models including pet carriers");
     }
   } catch (error) {
     console.error("Error initializing airline data:", error);
