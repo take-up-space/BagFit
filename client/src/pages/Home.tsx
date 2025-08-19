@@ -79,7 +79,6 @@ export default function Home() {
           </div>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Hero Section */}
@@ -87,10 +86,7 @@ export default function Home() {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Will Your Bag Fit Under the Seat in Front of You?
           </h1>
-          <p className="text-xl text-gray-600 mb-6 max-w-2xl mx-auto">
-            Check your bag dimensions against airline underseat space requirements. 
-            Avoid surprises at the gate with verified airline data.
-            {!isAuthenticated && (
+          <p className="text-xl text-gray-600 mb-6 max-w-2xl mx-auto">Check your personal item dimensions against airline underseat space requirements. Avoid surprises at the gate with verified airline data.{!isAuthenticated && (
               <span className="block mt-2 text-sm text-blue-600">
                 💡 <a href="/api/login" className="underline hover:text-blue-800">Create a free account</a> to save your bags for future trips!
               </span>
