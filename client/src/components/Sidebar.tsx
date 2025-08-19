@@ -96,7 +96,7 @@ export default function Sidebar() {
             </div>
             <div className="flex items-start space-x-3">
               <i className="fas fa-check-circle text-success-green mt-0.5"></i>
-              <p className="text-sm text-gray-700">Aisle seats may have smaller storage space due to foot guards and electronics boxes.</p>
+              <p className="text-sm text-gray-700">Aisle seats may have smaller storage space due to foot guards and electronics boxes</p>
             </div>
           </div>
         </CardContent>
