@@ -57,7 +57,10 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
   const { toast } = useToast();
   const [selectedAirline, setSelectedAirline] = useState("");
   const [flightNumber, setFlightNumber] = useState("");
-  const [unit, setUnit] = useState<"in" | "cm">("in");
+  const [unit, setUnit] = useState<"in" | "cm">(() => {
+    const storedUnit = localStorage.getItem('preferredUnit');
+    return (storedUnit === 'cm' || storedUnit === 'in') ? storedUnit : 'in';
+  });
   const [dimensions, setDimensions] = useState({
     length: "",
     width: "",
@@ -271,6 +274,8 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
       }));
     }
     setUnit(newUnit);
+    // Save user preference to localStorage
+    localStorage.setItem('preferredUnit', newUnit);
   };
 
   return (

@@ -39,6 +39,7 @@ export interface IStorage {
   // User bag operations
   getUserBags(userId: string): Promise<(UserBag & { bag: Bag })[]>;
   addUserBag(userBag: InsertUserBag): Promise<UserBag>;
+  updateUserBag(userId: string, userBagId: string, updateData: { customName: string }): Promise<UserBag>;
   removeUserBag(userId: string, bagId: string): Promise<void>;
   
   // Bag check operations
@@ -147,6 +148,18 @@ export class DatabaseStorage implements IStorage {
       .values(userBag)
       .returning();
     return newUserBag;
+  }
+
+  async updateUserBag(userId: string, userBagId: string, updateData: { customName: string }): Promise<UserBag> {
+    const [updatedUserBag] = await db
+      .update(userBags)
+      .set({ 
+        customName: updateData.customName,
+        updatedAt: new Date()
+      })
+      .where(and(eq(userBags.userId, userId), eq(userBags.id, userBagId)))
+      .returning();
+    return updatedUserBag;
   }
 
   async removeUserBag(userId: string, bagId: string): Promise<void> {

@@ -38,7 +38,11 @@ export default function MyBags() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [unit, setUnit] = useState<"in" | "cm">("in");
+  // Get unit preference from localStorage (set by BagCheckForm)
+  const [unit, setUnit] = useState<"in" | "cm">(() => {
+    const storedUnit = localStorage.getItem('preferredUnit');
+    return (storedUnit === 'cm' || storedUnit === 'in') ? storedUnit : 'in';
+  });
   const [formData, setFormData] = useState({
     customName: "",
     brand: "",
@@ -617,30 +621,69 @@ export default function MyBags() {
                   <div className="space-y-3">
                     <div className="grid grid-cols-3 gap-3 text-sm">
                       <div className="text-center">
-                        <div className="font-medium text-gray-900" data-testid={`text-length-${userBag.id}`}>
-                          {parseFloat(userBag.bag.lengthCm).toFixed(1)}cm
-                        </div>
-                        <div className="text-gray-500">
-                          {cmToInches(parseFloat(userBag.bag.lengthCm))}"
-                        </div>
+                        {unit === "cm" ? (
+                          <>
+                            <div className="font-medium text-gray-900" data-testid={`text-length-${userBag.id}`}>
+                              {parseFloat(userBag.bag.lengthCm).toFixed(1)}cm
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {cmToInches(parseFloat(userBag.bag.lengthCm))}"
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="font-medium text-gray-900" data-testid={`text-length-${userBag.id}`}>
+                              {cmToInches(parseFloat(userBag.bag.lengthCm))}"
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {parseFloat(userBag.bag.lengthCm).toFixed(1)}cm
+                            </div>
+                          </>
+                        )}
                         <div className="text-xs text-gray-400">Length</div>
                       </div>
                       <div className="text-center">
-                        <div className="font-medium text-gray-900" data-testid={`text-width-${userBag.id}`}>
-                          {parseFloat(userBag.bag.widthCm).toFixed(1)}cm
-                        </div>
-                        <div className="text-gray-500">
-                          {cmToInches(parseFloat(userBag.bag.widthCm))}"
-                        </div>
+                        {unit === "cm" ? (
+                          <>
+                            <div className="font-medium text-gray-900" data-testid={`text-width-${userBag.id}`}>
+                              {parseFloat(userBag.bag.widthCm).toFixed(1)}cm
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {cmToInches(parseFloat(userBag.bag.widthCm))}"
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="font-medium text-gray-900" data-testid={`text-width-${userBag.id}`}>
+                              {cmToInches(parseFloat(userBag.bag.widthCm))}"
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {parseFloat(userBag.bag.widthCm).toFixed(1)}cm
+                            </div>
+                          </>
+                        )}
                         <div className="text-xs text-gray-400">Width</div>
                       </div>
                       <div className="text-center">
-                        <div className="font-medium text-gray-900" data-testid={`text-height-${userBag.id}`}>
-                          {parseFloat(userBag.bag.heightCm).toFixed(1)}cm
-                        </div>
-                        <div className="text-gray-500">
-                          {cmToInches(parseFloat(userBag.bag.heightCm))}"
-                        </div>
+                        {unit === "cm" ? (
+                          <>
+                            <div className="font-medium text-gray-900" data-testid={`text-height-${userBag.id}`}>
+                              {parseFloat(userBag.bag.heightCm).toFixed(1)}cm
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {cmToInches(parseFloat(userBag.bag.heightCm))}"
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="font-medium text-gray-900" data-testid={`text-height-${userBag.id}`}>
+                              {cmToInches(parseFloat(userBag.bag.heightCm))}"
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {parseFloat(userBag.bag.heightCm).toFixed(1)}cm
+                            </div>
+                          </>
+                        )}
                         <div className="text-xs text-gray-400">Height</div>
                       </div>
                     </div>

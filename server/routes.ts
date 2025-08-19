@@ -185,6 +185,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch('/api/user/bags/:userBagId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { userBagId } = req.params;
+      const updateSchema = z.object({
+        customName: z.string().min(1, "Custom name is required")
+      });
+      
+      const updateData = updateSchema.parse(req.body);
+      const updatedUserBag = await storage.updateUserBag(userId, userBagId, updateData);
+      res.json(updatedUserBag);
+    } catch (error) {
+      console.error("Error updating user bag:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid update data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update user bag" });
+    }
+  });
+
   app.delete('/api/user/bags/:bagId', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
