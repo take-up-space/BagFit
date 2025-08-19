@@ -1,86 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import VerificationBadge from "./ui/verification-badge";
 
-interface Airline {
-  id: string;
-  name: string;
-  iataCode: string;
-  verificationStatus: string;
-}
-
-function getAirlineLogoColor(iataCode: string): string {
-  const colors: { [key: string]: string } = {
-    'AA': 'bg-red-600',
-    'UA': 'bg-blue-800', 
-    'WN': 'bg-blue-900',
-    'DL': 'bg-red-700',
-    'B6': 'bg-blue-600',
-    'F9': 'bg-green-600',
-  };
-  return colors[iataCode] || 'bg-gray-600';
-}
-
-interface SidebarProps {
-  selectedAirlineCode?: string;
-}
-
-export default function Sidebar({ selectedAirlineCode }: SidebarProps = {}) {
-  const { data: airlines } = useQuery({
-    queryKey: ["/api/airlines"],
-    retry: false,
-  });
-
-  // Filter airlines for verification status section
-  const airlinesToShow = selectedAirlineCode 
-    ? (airlines as Airline[])?.filter((airline: Airline) => airline.iataCode === selectedAirlineCode) || []
-    : (airlines as Airline[])?.slice(0, 6) || [];
+export default function Sidebar() {
 
   return (
     <div className="space-y-8">
       
-      {/* Verification Status Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg text-gray-900 flex items-center">
-            <i className="fas fa-shield-alt text-verified-blue mr-2"></i>
-            Data Verification Status
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {airlinesToShow.map((airline: Airline) => (
-              <div 
-                key={airline.id}
-                className={`flex items-center justify-between p-3 rounded-lg border ${
-                  airline.verificationStatus === 'VERIFIED_OFFICIAL' 
-                    ? 'bg-green-50 border-green-200' 
-                    : 'bg-orange-50 border-orange-200'
-                }`}
-                data-testid={`status-card-${airline.iataCode}`}
-              >
-                <div className="flex items-center">
-                  <div className={`w-8 h-8 ${getAirlineLogoColor(airline.iataCode)} rounded-full flex items-center justify-center text-white text-xs font-bold mr-3`}>
-                    {airline.iataCode}
-                  </div>
-                  <span className="font-medium text-gray-800" data-testid={`text-airline-name-sidebar-${airline.iataCode}`}>
-                    {airline.name}
-                  </span>
-                </div>
-                <VerificationBadge status={airline.verificationStatus} />
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800">
-              <i className="fas fa-info-circle mr-2"></i>
-              <strong>Verified</strong> dimensions come from official airline sources. 
-              <strong> Unverified</strong> data uses conservative estimates.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      
 
       {/* Popular Underseat Bags */}
       <Card>
