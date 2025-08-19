@@ -29,11 +29,16 @@ function cmToInches(cm: number): number {
   return Math.round(cm / 2.54 * 100) / 100;
 }
 
+function inchesToCm(inches: number): number {
+  return Math.round(inches * 2.54 * 100) / 100;
+}
+
 export default function MyBags() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [unit, setUnit] = useState<"in" | "cm">("in");
   const [formData, setFormData] = useState({
     customName: "",
     brand: "",
@@ -67,13 +72,24 @@ export default function MyBags() {
 
   const addBagMutation = useMutation({
     mutationFn: async (bagData: any) => {
+      // Convert dimensions to cm if needed
+      let lengthCm = parseFloat(bagData.lengthCm);
+      let widthCm = parseFloat(bagData.widthCm);
+      let heightCm = parseFloat(bagData.heightCm);
+      
+      if (unit === "in") {
+        lengthCm = inchesToCm(lengthCm);
+        widthCm = inchesToCm(widthCm);
+        heightCm = inchesToCm(heightCm);
+      }
+
       // First create the bag
       const bagResponse = await apiRequest("POST", "/api/bags", {
         brand: bagData.brand,
         model: bagData.model,
-        lengthCm: parseFloat(bagData.lengthCm),
-        widthCm: parseFloat(bagData.widthCm),
-        heightCm: parseFloat(bagData.heightCm),
+        lengthCm,
+        widthCm,
+        heightCm,
         isPetCarrier: bagData.isPetCarrier,
       });
       
@@ -90,6 +106,7 @@ export default function MyBags() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user/bags"] });
       setShowAddForm(false);
+      setUnit("in");
       setFormData({
         customName: "",
         brand: "",
@@ -169,6 +186,30 @@ export default function MyBags() {
     }
 
     addBagMutation.mutate(formData);
+  };
+
+  const handleUnitChange = (newUnit: "in" | "cm") => {
+    // Convert existing dimensions to new unit
+    if (formData.lengthCm || formData.widthCm || formData.heightCm) {
+      const convertValue = (value: string, fromUnit: "in" | "cm", toUnit: "in" | "cm") => {
+        if (!value) return "";
+        const numValue = parseFloat(value);
+        if (fromUnit === "cm" && toUnit === "in") {
+          return cmToInches(numValue).toFixed(1);
+        } else if (fromUnit === "in" && toUnit === "cm") {
+          return inchesToCm(numValue).toFixed(1);
+        }
+        return value;
+      };
+
+      setFormData(prev => ({
+        ...prev,
+        lengthCm: convertValue(prev.lengthCm, unit, newUnit),
+        widthCm: convertValue(prev.widthCm, unit, newUnit),
+        heightCm: convertValue(prev.heightCm, unit, newUnit),
+      }));
+    }
+    setUnit(newUnit);
   };
 
   if (authLoading) {
@@ -298,40 +339,69 @@ export default function MyBags() {
                   </div>
                 </div>
 
+                {/* Unit Toggle */}
+                <div className="flex justify-between items-center mb-4">
+                  <div className="flex items-center space-x-4">
+                    <span className="text-sm font-medium text-gray-700">Units:</span>
+                    <div className="flex bg-gray-100 rounded-lg p-1">
+                      <button
+                        type="button"
+                        className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                          unit === "in" ? "bg-airline-blue text-white" : "text-gray-600 hover:text-gray-800"
+                        }`}
+                        onClick={() => handleUnitChange("in")}
+                        data-testid="button-unit-inches-mybags"
+                      >
+                        Inches
+                      </button>
+                      <button
+                        type="button"
+                        className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                          unit === "cm" ? "bg-airline-blue text-white" : "text-gray-600 hover:text-gray-800"
+                        }`}
+                        onClick={() => handleUnitChange("cm")}
+                        data-testid="button-unit-cm-mybags"
+                      >
+                        CM
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="lengthCm">Length (cm) *</Label>
+                    <Label htmlFor="lengthCm">Length ({unit}) *</Label>
                     <Input
                       id="lengthCm"
                       type="number"
                       step="0.1"
                       value={formData.lengthCm}
                       onChange={(e) => setFormData(prev => ({ ...prev, lengthCm: e.target.value }))}
-                      placeholder="45.0"
+                      placeholder={unit === "in" ? "18.0" : "45.0"}
                       data-testid="input-length"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="widthCm">Width (cm) *</Label>
+                    <Label htmlFor="widthCm">Width ({unit}) *</Label>
                     <Input
                       id="widthCm"
                       type="number"
                       step="0.1"
                       value={formData.widthCm}
                       onChange={(e) => setFormData(prev => ({ ...prev, widthCm: e.target.value }))}
-                      placeholder="35.0"
+                      placeholder={unit === "in" ? "14.0" : "35.0"}
                       data-testid="input-width"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="heightCm">Height (cm) *</Label>
+                    <Label htmlFor="heightCm">Height ({unit}) *</Label>
                     <Input
                       id="heightCm"
                       type="number"
                       step="0.1"
                       value={formData.heightCm}
                       onChange={(e) => setFormData(prev => ({ ...prev, heightCm: e.target.value }))}
-                      placeholder="20.0"
+                      placeholder={unit === "in" ? "8.0" : "20.0"}
                       data-testid="input-height"
                     />
                   </div>
