@@ -4,9 +4,6 @@ export default function Sidebar() {
 
   return (
     <div className="space-y-8">
-      
-      
-
       {/* Popular Underseat Bags */}
       <Card>
         <CardHeader>
@@ -74,7 +71,6 @@ export default function Sidebar() {
           </div>
         </CardContent>
       </Card>
-
       {/* Quick Tips */}
       <Card>
         <CardHeader>
@@ -100,7 +96,7 @@ export default function Sidebar() {
             </div>
             <div className="flex items-start space-x-3">
               <i className="fas fa-check-circle text-success-green mt-0.5"></i>
-              <p className="text-sm text-gray-700">Be aware that under-seat dimensions can vary even on the same aircraft. Aisle seats may have smaller storage space due to foot guards and electronics boxes. (Unfortunately, electronics boxes may sometimes also appear under middle or window seats.)</p>
+              <p className="text-sm text-gray-700">Aisle seats may have smaller storage space due to foot guards and electronics boxes.</p>
             </div>
           </div>
         </CardContent>
