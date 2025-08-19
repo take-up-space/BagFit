@@ -64,7 +64,7 @@ export default function Sidebar({ selectedAirlineCode }: SidebarProps = {}) {
                     {airline.iataCode}
                   </div>
                   <span className="font-medium text-gray-800" data-testid={`text-airline-name-sidebar-${airline.iataCode}`}>
-                    {airline.name.split(' ')[0]} {/* Show shortened name */}
+                    {airline.name}
                   </span>
                 </div>
                 <VerificationBadge status={airline.verificationStatus} />
