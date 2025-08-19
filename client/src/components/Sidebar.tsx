@@ -93,10 +93,7 @@ export default function Sidebar() {
               <i className="fas fa-check-circle text-success-green mt-0.5"></i>
               <p className="text-sm text-gray-700">Consider wheels and handles in total dimensions</p>
             </div>
-            <div className="flex items-start space-x-3">
-              <i className="fas fa-check-circle text-success-green mt-0.5"></i>
-              <p className="text-sm text-gray-700">Pack heavier items in your underseat bag for easier access</p>
-            </div>
+            
             <div className="flex items-start space-x-3">
               <i className="fas fa-check-circle text-success-green mt-0.5"></i>
               <p className="text-sm text-gray-700">Some airlines are stricter than others - when in doubt, go smaller</p>
