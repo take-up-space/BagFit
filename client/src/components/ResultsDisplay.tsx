@@ -245,13 +245,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                 </p>
               </div>
             </div>
-            {result.airline.lastVerifiedDate && (
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-700" data-testid="text-last-verified">
-                  {new Date(result.airline.lastVerifiedDate).toLocaleDateString()}
-                </p>
-              </div>
-            )}
+            
           </div>
         </div>
 
