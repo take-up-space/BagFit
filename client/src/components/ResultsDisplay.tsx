@@ -230,7 +230,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
                     }
                     {result.airline.sourceUrl && (
                       <>
-                        {" "}
+                        . {" "}
                         <a 
                           href={result.airline.sourceUrl} 
                           target="_blank" 
@@ -299,9 +299,16 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
               <div className={`w-8 h-8 ${getAirlineLogoColor(result.airline.iataCode)} rounded-full flex items-center justify-center text-white text-xs font-bold mr-3`}>
                 {result.airline.iataCode}
               </div>
-              <span className="font-medium text-gray-800">
-                {result.airline.name}
-              </span>
+              <div>
+                <span className="font-medium text-gray-800">
+                  {result.airline.name}
+                </span>
+                {result.airline.lastVerifiedDate && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Last verified: {new Date(result.airline.lastVerifiedDate).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
             </div>
             <VerificationBadge status={result.airline.verificationStatus} />
           </div>
