@@ -457,7 +457,7 @@ export default function MyBags() {
             <i className="fas fa-spinner fa-spin text-4xl text-airline-blue mb-4"></i>
             <p className="text-gray-600">Loading your bags...</p>
           </div>
-        ) : !userBags || userBags.length === 0 ? (
+        ) : !userBags || (userBags as UserBag[]).length === 0 ? (
           <Card className="text-center py-16">
             <CardContent>
               <i className="fas fa-suitcase text-6xl text-gray-300 mb-4"></i>
@@ -474,7 +474,7 @@ export default function MyBags() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {userBags.map((userBag: UserBag) => (
+            {(userBags as UserBag[]).map((userBag: UserBag) => (
               <Card key={userBag.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
