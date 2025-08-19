@@ -102,220 +102,219 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
 
   return (
     <>
-    <Card className="mb-8" data-testid="card-results">
-      <CardContent className="pt-6">
-        <div className="text-center mb-6">
-          <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-4 ${
-            result.fitsUnderSeat ? 'bg-success-green' : 'bg-error-red'
-          }`}>
-            <i className={`fas ${result.fitsUnderSeat ? 'fa-check' : 'fa-times'} text-white text-2xl`}></i>
-          </div>
-          <h2 className={`text-3xl font-bold mb-2 ${
-            result.fitsUnderSeat ? 'text-success-green' : 'text-error-red'
-          }`} data-testid="text-result-status">
-            {result.fitsUnderSeat ? '✓ Your Bag Fits!' : 
-             (result.exceedsIn.includes('Pet carriers not allowed') ? '✗ Pet Carriers Not Allowed' : '✗ Bag Too Large')}
-          </h2>
-          <p className="text-gray-600" data-testid="text-result-description">
-            {result.fitsUnderSeat 
-              ? `Your bag meets ${result.airline.name} underseat requirements`
-              : (result.exceedsIn.includes('Pet carriers not allowed') 
-                  ? `${result.airline.name} does not allow pet carriers in the cabin`
-                  : `Your bag exceeds ${result.isPetCarrier ? 'pet carrier' : ''} limits in: ${result.exceedsIn.join(', ')}`
-                )
-            }
-          </p>
-        </div>
-
-        {/* Dimension Comparison */}
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <h3 className="text-lg font-medium text-gray-800 mb-4">Dimension Comparison</h3>
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <h4 className="text-sm font-medium text-gray-600 mb-2">Your Bag</h4>
-              <div className="space-y-2">
-                <div className="flex justify-between" data-testid="text-your-bag-length">
-                  <span>Length:</span>
-                  <span className="font-medium">{result.bagDimensions.lengthIn}" ({result.bagDimensions.lengthCm.toFixed(1)}cm)</span>
-                </div>
-                <div className="flex justify-between" data-testid="text-your-bag-width">
-                  <span>Width:</span>
-                  <span className="font-medium">{result.bagDimensions.widthIn}" ({result.bagDimensions.widthCm.toFixed(1)}cm)</span>
-                </div>
-                <div className="flex justify-between" data-testid="text-your-bag-height">
-                  <span>Height:</span>
-                  <span className="font-medium">{result.bagDimensions.heightIn}" ({result.bagDimensions.heightCm.toFixed(1)}cm)</span>
-                </div>
-              </div>
+      <Card className="mb-8" data-testid="card-results">
+        <CardContent className="pt-6">
+          <div className="text-center mb-6">
+            <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-4 ${
+              result.fitsUnderSeat ? 'bg-success-green' : 'bg-error-red'
+            }`}>
+              <i className={`fas ${result.fitsUnderSeat ? 'fa-check' : 'fa-times'} text-white text-2xl`}></i>
             </div>
-            <div>
-              <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center">
-                {result.isPetCarrier && result.airline.petCarrierMaxLengthCm && (
-                  parseFloat(result.airline.petCarrierMaxLengthCm) !== parseFloat(result.airline.maxPersonalItemLengthCm) ||
-                  parseFloat(result.airline.petCarrierMaxWidthCm || '0') !== parseFloat(result.airline.maxPersonalItemWidthCm) ||
-                  parseFloat(result.airline.petCarrierMaxHeightCm || '0') !== parseFloat(result.airline.maxPersonalItemHeightCm)
-                ) ? 'Pet Carrier Limit' : 'Airline Limit'}
-                <span className="ml-2">
-                  <VerificationBadge status={result.airline.verificationStatus} />
-                </span>
-              </h4>
-              <div className="space-y-2">
-                <div className="flex justify-between" data-testid="text-airline-limit-length">
-                  <span>Length:</span>
-                  <span className={`font-medium ${
-                    result.bagDimensions.lengthCm <= parseFloat(
-                      result.isPetCarrier && result.airline.petCarrierMaxLengthCm 
-                        ? result.airline.petCarrierMaxLengthCm 
-                        : result.airline.maxPersonalItemLengthCm
-                    ) ? 'text-success-green' : 'text-error-red'
-                  }`}>
-                    {result.isPetCarrier && result.airline.petCarrierMaxLengthCm ? 
-                      `${cmToInches(parseFloat(result.airline.petCarrierMaxLengthCm))}" (${parseFloat(result.airline.petCarrierMaxLengthCm).toFixed(1)}cm)` :
-                      `${cmToInches(parseFloat(result.airline.maxPersonalItemLengthCm))}" (${parseFloat(result.airline.maxPersonalItemLengthCm).toFixed(1)}cm)`
-                    }
-                  </span>
-                </div>
-                <div className="flex justify-between" data-testid="text-airline-limit-width">
-                  <span>Width:</span>
-                  <span className={`font-medium ${
-                    result.bagDimensions.widthCm <= parseFloat(
-                      result.isPetCarrier && result.airline.petCarrierMaxWidthCm 
-                        ? result.airline.petCarrierMaxWidthCm 
-                        : result.airline.maxPersonalItemWidthCm
-                    ) ? 'text-success-green' : 'text-error-red'
-                  }`}>
-                    {result.isPetCarrier && result.airline.petCarrierMaxWidthCm ? 
-                      `${cmToInches(parseFloat(result.airline.petCarrierMaxWidthCm))}" (${parseFloat(result.airline.petCarrierMaxWidthCm).toFixed(1)}cm)` :
-                      `${cmToInches(parseFloat(result.airline.maxPersonalItemWidthCm))}" (${parseFloat(result.airline.maxPersonalItemWidthCm).toFixed(1)}cm)`
-                    }
-                  </span>
-                </div>
-                <div className="flex justify-between" data-testid="text-airline-limit-height">
-                  <span>Height:</span>
-                  <span className={`font-medium ${
-                    result.bagDimensions.heightCm <= parseFloat(
-                      result.isPetCarrier && result.airline.petCarrierMaxHeightCm 
-                        ? result.airline.petCarrierMaxHeightCm 
-                        : result.airline.maxPersonalItemHeightCm
-                    ) ? 'text-success-green' : 'text-error-red'
-                  }`}>
-                    {result.isPetCarrier && result.airline.petCarrierMaxHeightCm ? 
-                      `${cmToInches(parseFloat(result.airline.petCarrierMaxHeightCm))}" (${parseFloat(result.airline.petCarrierMaxHeightCm).toFixed(1)}cm)` :
-                      `${cmToInches(parseFloat(result.airline.maxPersonalItemHeightCm))}" (${parseFloat(result.airline.maxPersonalItemHeightCm).toFixed(1)}cm)`
-                    }
-                  </span>
-                </div>
-              </div>
-            </div>
+            <h2 className={`text-3xl font-bold mb-2 ${
+              result.fitsUnderSeat ? 'text-success-green' : 'text-error-red'
+            }`} data-testid="text-result-status">
+              {result.fitsUnderSeat ? '✓ Your Bag Fits!' : 
+               (result.exceedsIn.includes('Pet carriers not allowed') ? '✗ Pet Carriers Not Allowed' : '✗ Bag Too Large')}
+            </h2>
+            <p className="text-gray-600" data-testid="text-result-description">
+              {result.fitsUnderSeat 
+                ? `Your bag meets ${result.airline.name} underseat requirements`
+                : (result.exceedsIn.includes('Pet carriers not allowed') 
+                    ? `${result.airline.name} does not allow pet carriers in the cabin`
+                    : `Your bag exceeds ${result.isPetCarrier ? 'pet carrier' : ''} limits in: ${result.exceedsIn.join(', ')}`
+                  )
+              }
+            </p>
           </div>
-        </div>
 
-        {/* Data Verification Status */}
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start space-x-3">
-              <i className={`fas ${
-                result.airline.verificationStatus === 'VERIFIED_OFFICIAL' ? 'fa-shield-check text-verified-blue' :
-                result.airline.verificationStatus === 'UNVERIFIED_CONSERVATIVE' ? 'fa-exclamation-triangle text-warning-orange' :
-                'fa-question-circle text-gray-500'
-              } mt-0.5`}></i>
+          {/* Dimension Comparison */}
+          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <h3 className="text-lg font-medium text-gray-800 mb-4">Dimension Comparison</h3>
+            <div className="grid grid-cols-2 gap-6">
               <div>
-                <p className="font-medium text-gray-800 mb-1">Data Verification Status</p>
-                <p className="text-sm text-gray-600">
-                  {result.airline.verificationStatus === 'VERIFIED_OFFICIAL' ? 
-                    `Verified official data from ${result.airline.name}` :
-                    result.airline.verificationStatus === 'UNVERIFIED_CONSERVATIVE' ?
-                    `Conservative estimates - verify with ${result.airline.name} before traveling` :
-                    'Data needs review - please verify independently'
-                  }
-                  {result.airline.sourceUrl && (
-                    <>
-                      {" "}
-                      <a 
-                        href={result.airline.sourceUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="underline hover:no-underline"
-                        data-testid="link-airline-policy"
-                      >
-                        Check official policy
-                      </a>
-                    </>
-                  )}
-                </p>
+                <h4 className="text-sm font-medium text-gray-600 mb-2">Your Bag</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between" data-testid="text-your-bag-length">
+                    <span>Length:</span>
+                    <span className="font-medium">{result.bagDimensions.lengthIn}" ({result.bagDimensions.lengthCm.toFixed(1)}cm)</span>
+                  </div>
+                  <div className="flex justify-between" data-testid="text-your-bag-width">
+                    <span>Width:</span>
+                    <span className="font-medium">{result.bagDimensions.widthIn}" ({result.bagDimensions.widthCm.toFixed(1)}cm)</span>
+                  </div>
+                  <div className="flex justify-between" data-testid="text-your-bag-height">
+                    <span>Height:</span>
+                    <span className="font-medium">{result.bagDimensions.heightIn}" ({result.bagDimensions.heightCm.toFixed(1)}cm)</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center">
+                  {result.isPetCarrier && result.airline.petCarrierMaxLengthCm && (
+                    parseFloat(result.airline.petCarrierMaxLengthCm) !== parseFloat(result.airline.maxPersonalItemLengthCm) ||
+                    parseFloat(result.airline.petCarrierMaxWidthCm || '0') !== parseFloat(result.airline.maxPersonalItemWidthCm) ||
+                    parseFloat(result.airline.petCarrierMaxHeightCm || '0') !== parseFloat(result.airline.maxPersonalItemHeightCm)
+                  ) ? 'Pet Carrier Limit' : 'Airline Limit'}
+                  <span className="ml-2">
+                    <VerificationBadge status={result.airline.verificationStatus} />
+                  </span>
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between" data-testid="text-airline-limit-length">
+                    <span>Length:</span>
+                    <span className={`font-medium ${
+                      result.bagDimensions.lengthCm <= parseFloat(
+                        result.isPetCarrier && result.airline.petCarrierMaxLengthCm 
+                          ? result.airline.petCarrierMaxLengthCm 
+                          : result.airline.maxPersonalItemLengthCm
+                      ) ? 'text-success-green' : 'text-error-red'
+                    }`}>
+                      {result.isPetCarrier && result.airline.petCarrierMaxLengthCm ? 
+                        `${cmToInches(parseFloat(result.airline.petCarrierMaxLengthCm))}" (${parseFloat(result.airline.petCarrierMaxLengthCm).toFixed(1)}cm)` :
+                        `${cmToInches(parseFloat(result.airline.maxPersonalItemLengthCm))}" (${parseFloat(result.airline.maxPersonalItemLengthCm).toFixed(1)}cm)`
+                      }
+                    </span>
+                  </div>
+                  <div className="flex justify-between" data-testid="text-airline-limit-width">
+                    <span>Width:</span>
+                    <span className={`font-medium ${
+                      result.bagDimensions.widthCm <= parseFloat(
+                        result.isPetCarrier && result.airline.petCarrierMaxWidthCm 
+                          ? result.airline.petCarrierMaxWidthCm 
+                          : result.airline.maxPersonalItemWidthCm
+                      ) ? 'text-success-green' : 'text-error-red'
+                    }`}>
+                      {result.isPetCarrier && result.airline.petCarrierMaxWidthCm ? 
+                        `${cmToInches(parseFloat(result.airline.petCarrierMaxWidthCm))}" (${parseFloat(result.airline.petCarrierMaxWidthCm).toFixed(1)}cm)` :
+                        `${cmToInches(parseFloat(result.airline.maxPersonalItemWidthCm))}" (${parseFloat(result.airline.maxPersonalItemWidthCm).toFixed(1)}cm)`
+                      }
+                    </span>
+                  </div>
+                  <div className="flex justify-between" data-testid="text-airline-limit-height">
+                    <span>Height:</span>
+                    <span className={`font-medium ${
+                      result.bagDimensions.heightCm <= parseFloat(
+                        result.isPetCarrier && result.airline.petCarrierMaxHeightCm 
+                          ? result.airline.petCarrierMaxHeightCm 
+                          : result.airline.maxPersonalItemHeightCm
+                      ) ? 'text-success-green' : 'text-error-red'
+                    }`}>
+                      {result.isPetCarrier && result.airline.petCarrierMaxHeightCm ? 
+                        `${cmToInches(parseFloat(result.airline.petCarrierMaxHeightCm))}" (${parseFloat(result.airline.petCarrierMaxHeightCm).toFixed(1)}cm)` :
+                        `${cmToInches(parseFloat(result.airline.maxPersonalItemHeightCm))}" (${parseFloat(result.airline.maxPersonalItemHeightCm).toFixed(1)}cm)`
+                      }
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-            
           </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Button 
-            onClick={() => saveBagMutation.mutate()}
-            disabled={saveBagMutation.isPending}
-            className="flex-1 bg-airline-blue text-white hover:bg-blue-700"
-            data-testid="button-save-bag"
-          >
-            {saveBagMutation.isPending ? (
-              <>
-                <i className="fas fa-spinner fa-spin mr-2"></i>
-                Saving...
-              </>
-            ) : (
-              <>
-                <i className="fas fa-save mr-2"></i>
-                Save to My Bags
-              </>
-            )}
-          </Button>
-          <Button 
-            variant="outline"
-            onClick={shareResult}
-            className="flex-1 border-airline-blue text-airline-blue hover:bg-blue-50"
-            data-testid="button-share"
-          >
-            <i className="fas fa-share-alt mr-2"></i>
-            Share Result
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-
-    {/* Data Verification Status Panel */}
-    <Card className="mt-6">
-      <CardHeader>
-        <CardTitle className="text-lg text-gray-900 flex items-center">
-          <i className="fas fa-shield-alt text-verified-blue mr-2"></i>
-          Data Verification Status
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className={`flex items-center justify-between p-3 rounded-lg border ${
-          result.airline.verificationStatus === 'VERIFIED_OFFICIAL' 
-            ? 'bg-green-50 border-green-200' 
-            : 'bg-orange-50 border-orange-200'
-        }`}>
-          <div className="flex items-center">
-            <div className={`w-8 h-8 ${getAirlineLogoColor(result.airline.iataCode)} rounded-full flex items-center justify-center text-white text-xs font-bold mr-3`}>
-              {result.airline.iataCode}
+          {/* Data Verification Status */}
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start space-x-3">
+                <i className={`fas ${
+                  result.airline.verificationStatus === 'VERIFIED_OFFICIAL' ? 'fa-shield-check text-verified-blue' :
+                  result.airline.verificationStatus === 'UNVERIFIED_CONSERVATIVE' ? 'fa-exclamation-triangle text-warning-orange' :
+                  'fa-question-circle text-gray-500'
+                } mt-0.5`}></i>
+                <div>
+                  <p className="font-medium text-gray-800 mb-1">Note</p>
+                  <p className="text-sm text-gray-600">
+                    {result.airline.verificationStatus === 'VERIFIED_OFFICIAL' ? 
+                      `Verified official data from ${result.airline.name}` :
+                      result.airline.verificationStatus === 'UNVERIFIED_CONSERVATIVE' ?
+                      `Conservative estimates - verify with ${result.airline.name} before traveling` :
+                      'Data needs review - please verify independently'
+                    }
+                    {result.airline.sourceUrl && (
+                      <>
+                        {" "}
+                        <a 
+                          href={result.airline.sourceUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="underline hover:no-underline"
+                          data-testid="link-airline-policy"
+                        >
+                          Check official policy
+                        </a>
+                      </>
+                    )}
+                  </p>
+                </div>
+              </div>
+              
             </div>
-            <span className="font-medium text-gray-800">
-              {result.airline.name}
-            </span>
           </div>
-          <VerificationBadge status={result.airline.verificationStatus} />
-        </div>
 
-        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-blue-800">
-            <i className="fas fa-info-circle mr-2"></i>
-            <strong>Verified</strong> dimensions come from official airline sources. 
-            <strong> Unverified</strong> data uses conservative estimates.
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button 
+              onClick={() => saveBagMutation.mutate()}
+              disabled={saveBagMutation.isPending}
+              className="flex-1 bg-airline-blue text-white hover:bg-blue-700"
+              data-testid="button-save-bag"
+            >
+              {saveBagMutation.isPending ? (
+                <>
+                  <i className="fas fa-spinner fa-spin mr-2"></i>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-save mr-2"></i>
+                  Save to My Bags
+                </>
+              )}
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={shareResult}
+              className="flex-1 border-airline-blue text-airline-blue hover:bg-blue-50"
+              data-testid="button-share"
+            >
+              <i className="fas fa-share-alt mr-2"></i>
+              Share Result
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      {/* Data Verification Status Panel */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-lg text-gray-900 flex items-center">
+            <i className="fas fa-shield-alt text-verified-blue mr-2"></i>
+            Data Verification Status
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className={`flex items-center justify-between p-3 rounded-lg border ${
+            result.airline.verificationStatus === 'VERIFIED_OFFICIAL' 
+              ? 'bg-green-50 border-green-200' 
+              : 'bg-orange-50 border-orange-200'
+          }`}>
+            <div className="flex items-center">
+              <div className={`w-8 h-8 ${getAirlineLogoColor(result.airline.iataCode)} rounded-full flex items-center justify-center text-white text-xs font-bold mr-3`}>
+                {result.airline.iataCode}
+              </div>
+              <span className="font-medium text-gray-800">
+                {result.airline.name}
+              </span>
+            </div>
+            <VerificationBadge status={result.airline.verificationStatus} />
+          </div>
+
+          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <i className="fas fa-info-circle mr-2"></i>
+              <strong>Verified</strong> dimensions come from official airline sources. 
+              <strong> Unverified</strong> data uses conservative estimates.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </>
   );
 }
