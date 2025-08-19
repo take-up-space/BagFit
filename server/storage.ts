@@ -154,8 +154,7 @@ export class DatabaseStorage implements IStorage {
     const [updatedUserBag] = await db
       .update(userBags)
       .set({ 
-        customName: updateData.customName,
-        updatedAt: new Date()
+        customName: updateData.customName
       })
       .where(and(eq(userBags.userId, userId), eq(userBags.id, userBagId)))
       .returning();
@@ -192,7 +191,7 @@ export class DatabaseStorage implements IStorage {
         fitsUnderSeat: bagChecks.fitsUnderSeat,
         createdAt: bagChecks.createdAt,
         airline: airlines,
-        bag: bags,
+        bag: bags as any,
       })
       .from(bagChecks)
       .innerJoin(airlines, eq(bagChecks.airlineId, airlines.id))
