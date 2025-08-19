@@ -355,17 +355,19 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                     <SelectValue placeholder="Choose from 80+ popular bag models..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {knownBags.map((bag: KnownBag) => (
-                      <SelectItem key={bag.id} value={bag.id} data-testid={`option-known-bag-${bag.id}`}>
-                        <div className="flex items-center justify-between w-full">
-                          <span>{bag.brand} {bag.model}</span>
-                          <span className="text-sm text-gray-500 ml-2">
-                            ({cmToInches(parseFloat(bag.lengthCm))}×{cmToInches(parseFloat(bag.widthCm))}×{cmToInches(parseFloat(bag.heightCm))}")
-                            {bag.isVerified && <span className="text-verified-blue ml-1">✓</span>}
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))}
+                    {knownBags
+                      .filter((bag: KnownBag) => !isPetCarrier || bag.isPetCarrier)
+                      .map((bag: KnownBag) => (
+                        <SelectItem key={bag.id} value={bag.id} data-testid={`option-known-bag-${bag.id}`}>
+                          <div className="flex items-center justify-between w-full">
+                            <span>{bag.brand} {bag.model}</span>
+                            <span className="text-sm text-gray-500 ml-2">
+                              ({cmToInches(parseFloat(bag.lengthCm))}×{cmToInches(parseFloat(bag.widthCm))}×{cmToInches(parseFloat(bag.heightCm))}")
+                              {bag.isVerified && <span className="text-verified-blue ml-1">✓</span>}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
