@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import BagCheckForm from "@/components/BagCheckForm";
 import Sidebar from "@/components/Sidebar";
 import AirlineReference from "@/components/AirlineReference";
-import airplaneSeatIcon from "@assets/generated_images/blue_airplane_seat_icon_ff94725c.png";
+import airplaneSeatIcon from "@assets/AirplaneChair_Icon_1755563723564.png";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
