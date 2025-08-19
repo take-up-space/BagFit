@@ -100,6 +100,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
   };
 
   return (
+    <>
     <Card className="mb-8" data-testid="card-results">
       <CardContent className="pt-6">
         <div className="text-center mb-6">
@@ -269,5 +270,80 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
         </div>
       </CardContent>
     </Card>
+
+    {/* Data Verification Status Panel */}
+    <Card className="mt-6">
+      <CardHeader>
+        <CardTitle className="text-lg text-gray-900 flex items-center">
+          <i className="fas fa-shield-alt text-verified-blue mr-2"></i>
+          Data Verification Status
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className={`flex items-center justify-between p-3 rounded-lg border ${
+          result.airline.verificationStatus === 'VERIFIED_OFFICIAL' 
+            ? 'bg-green-50 border-green-200' 
+            : 'bg-orange-50 border-orange-200'
+        }`}>
+          <div className="flex items-center">
+            <div className={`w-8 h-8 ${getAirlineLogoColor(result.airline.iataCode)} rounded-full flex items-center justify-center text-white text-xs font-bold mr-3`}>
+              {result.airline.iataCode}
+            </div>
+            <span className="font-medium text-gray-800">
+              {result.airline.name}
+            </span>
+          </div>
+          <VerificationBadge status={result.airline.verificationStatus} />
+        </div>
+
+        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+          <p className="text-sm text-blue-800">
+            <i className="fas fa-info-circle mr-2"></i>
+            <strong>Verified</strong> dimensions come from official airline sources. 
+            <strong> Unverified</strong> data uses conservative estimates.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+    </>
   );
+}
+
+// Helper function for airline logo colors
+function getAirlineLogoColor(iataCode: string): string {
+  const colors: { [key: string]: string } = {
+    'AA': 'bg-red-600',
+    'DL': 'bg-blue-600',
+    'UA': 'bg-blue-800',
+    'AS': 'bg-green-700',
+    'B6': 'bg-blue-500',
+    'F9': 'bg-green-600',
+    'NK': 'bg-yellow-500',
+    'WN': 'bg-red-500',
+    'EI': 'bg-green-600',
+    'AC': 'bg-red-700',
+    'AF': 'bg-blue-700',
+    'NH': 'bg-blue-900',
+    'AV': 'bg-red-600',
+    'BA': 'bg-blue-800',
+    'LH': 'bg-yellow-600',
+    'IB': 'bg-red-600',
+    'KL': 'bg-blue-600',
+    'LX': 'bg-red-700',
+    'OS': 'bg-red-600',
+    'TK': 'bg-red-700',
+    'VS': 'bg-red-500',
+    'EK': 'bg-red-600',
+    'QR': 'bg-purple-700',
+    'SG': 'bg-blue-800',
+    'CX': 'bg-green-700',
+    'JL': 'bg-red-600',
+    'SQ': 'bg-blue-800',
+    'TG': 'bg-purple-600',
+    'QF': 'bg-red-600',
+    'NZ': 'bg-black',
+    'FJ': 'bg-blue-600',
+    'VN': 'bg-yellow-600',
+  };
+  return colors[iataCode] || 'bg-gray-600';
 }

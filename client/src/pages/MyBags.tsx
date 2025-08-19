@@ -48,6 +48,8 @@ export default function MyBags() {
     heightCm: "",
     isPetCarrier: false,
   });
+  const [editingBagId, setEditingBagId] = useState<string | null>(null);
+  const [editingBagName, setEditingBagName] = useState("");
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -171,6 +173,61 @@ export default function MyBags() {
       });
     },
   });
+
+  const updateBagNameMutation = useMutation({
+    mutationFn: async ({ userBagId, customName }: { userBagId: string; customName: string }) => {
+      const response = await apiRequest("PATCH", `/api/user/bags/${userBagId}`, {
+        customName,
+      });
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/bags"] });
+      setEditingBagId(null);
+      setEditingBagName("");
+      toast({
+        title: "Success",
+        description: "Bag name updated successfully!",
+      });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to update bag name. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleEditBagName = (userBag: UserBag) => {
+    setEditingBagId(userBag.id);
+    setEditingBagName(userBag.customName);
+  };
+
+  const handleSaveBagName = () => {
+    if (editingBagId && editingBagName.trim()) {
+      updateBagNameMutation.mutate({
+        userBagId: editingBagId,
+        customName: editingBagName.trim(),
+      });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingBagId(null);
+    setEditingBagName("");
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -478,19 +535,74 @@ export default function MyBags() {
               <Card key={userBag.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg" data-testid={`text-bag-name-${userBag.id}`}>
-                      {userBag.customName}
-                    </CardTitle>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeBagMutation.mutate(userBag.bag.id)}
-                      disabled={removeBagMutation.isPending}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      data-testid={`button-remove-${userBag.id}`}
-                    >
-                      <i className="fas fa-trash"></i>
-                    </Button>
+                    {editingBagId === userBag.id ? (
+                      <div className="flex items-center space-x-2 flex-1">
+                        <Input
+                          value={editingBagName}
+                          onChange={(e) => setEditingBagName(e.target.value)}
+                          className="text-lg font-semibold"
+                          data-testid={`input-edit-bag-name-${userBag.id}`}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleSaveBagName();
+                            } else if (e.key === 'Escape') {
+                              handleCancelEdit();
+                            }
+                          }}
+                        />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleSaveBagName}
+                          disabled={updateBagNameMutation.isPending}
+                          className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                          data-testid={`button-save-name-${userBag.id}`}
+                        >
+                          <i className="fas fa-check"></i>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleCancelEdit}
+                          className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                          data-testid={`button-cancel-edit-${userBag.id}`}
+                        >
+                          <i className="fas fa-times"></i>
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <CardTitle 
+                          className="text-lg cursor-pointer hover:text-airline-blue" 
+                          data-testid={`text-bag-name-${userBag.id}`}
+                          onClick={() => handleEditBagName(userBag)}
+                          title="Click to edit bag name"
+                        >
+                          {userBag.customName}
+                        </CardTitle>
+                        <div className="flex space-x-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditBagName(userBag)}
+                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            data-testid={`button-edit-${userBag.id}`}
+                          >
+                            <i className="fas fa-edit"></i>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeBagMutation.mutate(userBag.bag.id)}
+                            disabled={removeBagMutation.isPending}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            data-testid={`button-remove-${userBag.id}`}
+                          >
+                            <i className="fas fa-trash"></i>
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                   <p className="text-sm text-gray-600" data-testid={`text-bag-brand-${userBag.id}`}>
                     {userBag.bag.brand} {userBag.bag.model}

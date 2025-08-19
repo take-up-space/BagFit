@@ -101,6 +101,10 @@ export default function Sidebar() {
               <i className="fas fa-check-circle text-success-green mt-0.5"></i>
               <p className="text-sm text-gray-700">Some airlines are stricter than others - when in doubt, go smaller</p>
             </div>
+            <div className="flex items-start space-x-3">
+              <i className="fas fa-check-circle text-success-green mt-0.5"></i>
+              <p className="text-sm text-gray-700">Be aware that under-seat dimensions can vary even on the same aircraft. Aisle seats may have smaller storage space due to foot guards and electronics boxes. (Unfortunately, electronics boxes may sometimes also appear under middle or window seats.)</p>
+            </div>
           </div>
         </CardContent>
       </Card>
