@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 import VerificationBadge from "./ui/verification-badge";
 
 interface ResultsDisplayProps {
@@ -43,6 +44,23 @@ function cmToInches(cm: number): number {
 export default function ResultsDisplay({ result }: ResultsDisplayProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuth();
+
+  const handleSaveBag = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to save bags to your collection.",
+        variant: "destructive",
+      });
+      // Redirect to login
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 1000);
+      return;
+    }
+    saveBagMutation.mutate();
+  };
 
   const saveBagMutation = useMutation({
     mutationFn: async () => {
@@ -53,7 +71,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
         lengthCm: result.bagDimensions.lengthCm,
         widthCm: result.bagDimensions.widthCm,
         heightCm: result.bagDimensions.heightCm,
-        isPetCarrier: false,
+        isPetCarrier: result.isPetCarrier,
       });
       
       const bag = await bagResponse.json();
@@ -76,7 +94,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
       console.error("Save bag error:", error);
       toast({
         title: "Error",
-        description: "Failed to save bag. You might need to log in first.",
+        description: "Failed to save bag. Please try again.",
         variant: "destructive",
       });
     },
@@ -252,7 +270,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
             <Button 
-              onClick={() => saveBagMutation.mutate()}
+              onClick={handleSaveBag}
               disabled={saveBagMutation.isPending}
               className="flex-1 bg-airline-blue text-white hover:bg-blue-700"
               data-testid="button-save-bag"

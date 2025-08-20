@@ -174,7 +174,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
     setValidationErrors({});
 
     // Determine the correct bagId to send
-    let bagIdToSend = selectedKnownBag;
+    let bagIdToSend: string | undefined = selectedKnownBag;
     if (selectedUserBag) {
       // For user bags, we need to use the actual bag.id, not the userBag.id
       const userBag = userBags.find((ub: UserBag) => ub.id === selectedUserBag);
@@ -364,6 +364,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                   </SelectTrigger>
                   <SelectContent>
                     {knownBags
+                      .filter((bag: KnownBag) => !isPetCarrier || bag.isPetCarrier)
                       .map((bag: KnownBag) => (
                         <SelectItem key={bag.id} value={bag.id} data-testid={`option-known-bag-${bag.id}`}>
                           <div className="flex items-center justify-between w-full">
