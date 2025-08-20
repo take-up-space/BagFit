@@ -404,12 +404,14 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                   </SelectTrigger>
                   <SelectContent>
                     {(() => {
-                      // NUCLEAR DEPLOYMENT FIX: Rewrite filtering logic completely (Aug 20 2025)
+                      console.log('RENDER DEBUG: About to filter bags, knownBags.length:', knownBags.length, 'isPetCarrier:', isPetCarrier);
                       let bagsToShow: KnownBag[];
                       if (isPetCarrier === true) {
                         bagsToShow = knownBags.filter((bag: KnownBag) => bag.isPetCarrier === true);
+                        console.log('Showing pet carriers only:', bagsToShow.length);
                       } else {
                         bagsToShow = knownBags.slice(); // Show all bags
+                        console.log('Showing all bags:', bagsToShow.length);
                       }
                       return bagsToShow;
                     })()
