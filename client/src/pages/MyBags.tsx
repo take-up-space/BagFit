@@ -195,7 +195,9 @@ export default function MyBags() {
         updateData.isPetCarrier = isPetCarrier;
       }
       
-      console.log("API Request Data:", updateData);
+      console.log("Mutation params received:", { userBagId, customName, isPetCarrier });
+      console.log("API Request Data being sent:", updateData);
+      
       const response = await apiRequest("PATCH", `/api/user/bags/${userBagId}`, updateData);
       return await response.json();
     },
@@ -238,20 +240,20 @@ export default function MyBags() {
 
   const handleSaveBagName = () => {
     if (editingBagId) {
-      const updateData: any = {
+      const mutationParams: any = {
         userBagId: editingBagId,
       };
       
       // Always include isPetCarrier since it's a boolean state
-      updateData.isPetCarrier = editingBagIsPetCarrier;
+      mutationParams.isPetCarrier = editingBagIsPetCarrier;
       
       // Include customName if it has content
       if (editingBagName && editingBagName.trim()) {
-        updateData.customName = editingBagName.trim();
+        mutationParams.customName = editingBagName.trim();
       }
       
-      console.log("Sending update data:", updateData);
-      updateBagNameMutation.mutate(updateData);
+      console.log("Sending mutation params:", mutationParams);
+      updateBagNameMutation.mutate(mutationParams);
     }
   };
 
