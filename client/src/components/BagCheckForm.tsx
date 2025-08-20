@@ -387,9 +387,9 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                       }
                       
                       if (isPetCarrier) {
-                        return `Choose from ${displayCount} pet carrier models... (v2.2.0-${Date.now().toString().slice(-6)})`;
+                        return `Choose from ${displayCount} pet carrier models...`;
                       } else {
-                        return `Choose from ${displayCount} popular bag models... (v2.2.0-${Date.now().toString().slice(-6)})`;
+                        return `Choose from ${displayCount} popular bag models...`;
                       }
                     })()} />
                   </SelectTrigger>
