@@ -371,7 +371,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                 </div>
                 <Select value={selectedKnownBag} onValueChange={handleKnownBagSelect}>
                   <SelectTrigger data-testid="select-known-bag">
-                    <SelectValue placeholder="Choose from 80+ popular bag models..." />
+                    <SelectValue placeholder={`Choose from ${knownBags.length} popular bag models...`} />
                   </SelectTrigger>
                   <SelectContent>
                     {knownBags
