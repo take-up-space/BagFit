@@ -173,6 +173,14 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
     // Clear any validation errors on successful submission
     setValidationErrors({});
 
+    // Determine the correct bagId to send
+    let bagIdToSend = selectedKnownBag;
+    if (selectedUserBag) {
+      // For user bags, we need to use the actual bag.id, not the userBag.id
+      const userBag = userBags.find((ub: UserBag) => ub.id === selectedUserBag);
+      bagIdToSend = userBag?.bag.id || undefined;
+    }
+
     checkBagMutation.mutate({
       airlineIataCode: selectedAirline,
       flightNumber: flightNumber || undefined,
@@ -180,7 +188,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
       bagWidthCm: bagWidthCm.toString(),
       bagHeightCm: bagHeightCm.toString(),
       isPetCarrier,
-      bagId: selectedKnownBag || selectedUserBag || undefined,
+      bagId: bagIdToSend || undefined,
     });
   };
 
@@ -209,11 +217,11 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
     }
   };
 
-  const handleUserBagSelect = (bagId: string) => {
-    setSelectedUserBag(bagId);
-    if (bagId) {
+  const handleUserBagSelect = (userBagId: string) => {
+    setSelectedUserBag(userBagId);
+    if (userBagId) {
       // Fill manual dimensions with selected user bag dimensions
-      const userBag = userBags.find((ub: UserBag) => ub.id === bagId);
+      const userBag = userBags.find((ub: UserBag) => ub.id === userBagId);
       if (userBag) {
         const lengthInUnit = unit === "cm" ? parseFloat(userBag.bag.lengthCm) : cmToInches(parseFloat(userBag.bag.lengthCm));
         const widthInUnit = unit === "cm" ? parseFloat(userBag.bag.widthCm) : cmToInches(parseFloat(userBag.bag.widthCm));

@@ -68,10 +68,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all bags route (public)
+  // Get all bags route (public) - only verified/popular bags
   app.get('/api/bags', async (req, res) => {
     try {
-      const bags = await storage.getAllBags();
+      const bags = await storage.getPopularBags();
       res.json(bags);
     } catch (error) {
       console.error("Error fetching bags:", error);

@@ -16,7 +16,7 @@ import {
   type InsertBagCheck,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, ne } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -32,6 +32,7 @@ export interface IStorage {
   
   // Bag operations
   getAllBags(): Promise<Bag[]>;
+  getPopularBags(): Promise<Bag[]>; // Only pre-loaded popular bags, not user-created
   getBagById(id: string): Promise<Bag | undefined>;
   searchBagsByBrand(brand: string): Promise<Bag[]>;
   createBag(bag: InsertBag): Promise<Bag>;
@@ -102,6 +103,14 @@ export class DatabaseStorage implements IStorage {
   // Bag operations
   async getAllBags(): Promise<Bag[]> {
     return await db.select().from(bags).orderBy(bags.brand, bags.model);
+  }
+
+  async getPopularBags(): Promise<Bag[]> {
+    // Only return verified bags or bags that were pre-loaded (not user-created custom bags)
+    // We can identify popular bags by filtering out ones that have unusual brand names like "Custom Manual Entry"
+    return await db.select().from(bags)
+      .where(ne(bags.brand, 'Custom Manual Entry'))
+      .orderBy(bags.brand, bags.model);
   }
 
   async getBagById(id: string): Promise<Bag | undefined> {
