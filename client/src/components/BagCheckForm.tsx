@@ -92,7 +92,8 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
 
   // Fetch all known bags from database
   const { data: knownBags = [] } = useQuery<KnownBag[]>({
-    queryKey: ["/api/bags"],
+    queryKey: ["/api/bags", "v2-cache-bust-2025-08-20"],
+    queryFn: () => fetch('/api/bags?cacheBust=' + Date.now()).then(res => res.json()),
     retry: false,
   });
 
@@ -372,7 +373,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                 <Select value={selectedKnownBag} onValueChange={handleKnownBagSelect}>
                   <SelectTrigger data-testid="select-known-bag">
                     <SelectValue placeholder={(() => {
-                      // Filter bags: pet carrier checkbox controls display (v1.0.1 cache bust)
+                      // CRITICAL FIX: Filter bags based on pet carrier checkbox (v2.1.0 DEPLOYMENT FIX)
                       const filteredBags = knownBags.filter((bag: KnownBag) => isPetCarrier ? bag.isPetCarrier : true);
                       const count = filteredBags.length;
                       if (count <= 20) {
@@ -385,7 +386,10 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                   </SelectTrigger>
                   <SelectContent>
                     {knownBags
-                      .filter((bag: KnownBag) => isPetCarrier ? bag.isPetCarrier : true)
+                      .filter((bag: KnownBag) => {
+                        // 2025-08-20 DEPLOYMENT FIX: Pet carrier filter logic
+                        return isPetCarrier ? bag.isPetCarrier : true;
+                      })
                       .map((bag: KnownBag) => (
                         <SelectItem key={bag.id} value={bag.id} data-testid={`option-known-bag-${bag.id}`}>
                           <div className="flex items-center justify-between w-full">
