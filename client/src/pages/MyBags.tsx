@@ -183,6 +183,8 @@ export default function MyBags() {
 
   const updateBagNameMutation = useMutation({
     mutationFn: async ({ userBagId, customName, isPetCarrier }: { userBagId: string; customName?: string; isPetCarrier?: boolean }) => {
+      console.log("🔄 Mutation executing with:", { userBagId, customName, isPetCarrier });
+      
       // SAFETY CHECK: Do not proceed with empty/invalid data
       if (!userBagId || (customName === undefined && isPetCarrier === undefined)) {
         throw new Error("Invalid mutation parameters");
@@ -200,6 +202,7 @@ export default function MyBags() {
         updateData.isPetCarrier = isPetCarrier;
       }
       
+      console.log("📤 Sending to API:", updateData);
       const response = await apiRequest("PATCH", `/api/user/bags/${userBagId}`, updateData);
       return await response.json();
     },
@@ -243,23 +246,16 @@ export default function MyBags() {
 
   const handleSaveBagName = () => {
     if (editingBagId) {
-      // Fix: Send the data fields directly, not wrapped in mutation params
-      const updateFields: any = {};
-      
-      // Always include isPetCarrier since it's a boolean state
-      updateFields.isPetCarrier = editingBagIsPetCarrier;
-      
-      // Include customName if it has content
-      if (editingBagName && editingBagName.trim()) {
-        updateFields.customName = editingBagName.trim();
-      }
-      
-
+      console.log("💾 Saving bag with:", {
+        userBagId: editingBagId,
+        customName: editingBagName?.trim() || undefined,
+        isPetCarrier: editingBagIsPetCarrier
+      });
       
       updateBagNameMutation.mutate({
         userBagId: editingBagId,
-        customName: updateFields.customName,
-        isPetCarrier: updateFields.isPetCarrier
+        customName: editingBagName?.trim() || undefined,
+        isPetCarrier: editingBagIsPetCarrier
       });
     }
   };

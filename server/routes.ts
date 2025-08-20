@@ -190,10 +190,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const { userBagId } = req.params;
       
-      // CRITICAL FIX: Block empty/phantom requests
+      // Development environment logging (ignore phantom requests in dev)
       if (!req.body || Object.keys(req.body).length === 0) {
-        console.log("❌ BLOCKING PHANTOM REQUEST - empty body from:", req.headers['user-agent']?.substring(0, 50));
-        return res.status(400).json({ message: "Empty request body not allowed" });
+        console.log("⚠️ Empty request body (dev environment issue) - ignoring");
+        return res.status(400).json({ message: "Empty request body" });
       }
       
       const updateSchema = z.object({
@@ -208,7 +208,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "At least one field must be provided for update" });
       }
       
+      console.log("✅ Valid update request:", { userId, userBagId, updateData });
       const updatedUserBag = await storage.updateUserBag(userId, userBagId, updateData);
+      console.log("✅ Update successful:", updatedUserBag);
       res.json(updatedUserBag);
     } catch (error) {
       console.error("Error updating user bag:", error);
