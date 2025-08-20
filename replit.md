@@ -4,7 +4,7 @@
 
 BagFit is a web application that helps travelers determine whether their personal bags will fit under airplane seats. The app compares user-entered bag dimensions against airline-specific underseat space requirements, with support for verified airline data, community contributions, and future AI-powered measurement features.
 
-The application follows a three-phase development roadmap: Phase 1 focuses on core functionality with manual inputs and Google Search integration, Phase 2 adds enhanced UX and community data features, and Phase 3 introduces AI/AR measurement capabilities.
+The application follows a three-phase development roadmap: Phase 1 (MVP - Complete) focuses on core functionality with verified data and user authentication, Phase 2 adds enhanced UX and community data features, and Phase 3 introduces AI/AR measurement capabilities. See ROADMAP.md for detailed feature planning.
 
 ## User Preferences
 
