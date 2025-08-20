@@ -296,12 +296,13 @@ export default function MyBags() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-airline-blue">
+              <Link href="/" className="text-2xl font-bold text-airline-blue flex items-center">
                 <img 
                   src={airplaneSeatIcon} 
                   alt="Airplane seat" 
-                  className="w-6 h-6 mr-2"
-                />BagFit
+                  className="w-6 h-6 mr-3"
+                />
+                BagFit
               </Link>
             </div>
             <div className="flex items-center space-x-4">
