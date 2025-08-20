@@ -63,10 +63,17 @@ Preferred communication style: Simple, everyday language.
 - **Community Data**: User-contributed dimension corrections and verification
 
 ### Development Workflow
-- **Development**: Hot reload with Vite dev server and TSX for backend
-- **Build Process**: Client-side Vite build + server-side ESBuild bundling
+- **Development**: Hot reload with Vite dev server and TSX for backend (`npm run dev`)
+- **Build Process**: Client-side Vite build + server-side ESBuild bundling (`npm run build`)
+- **Production**: Node.js server with built assets (`npm start`)
 - **Type Safety**: Shared TypeScript schema between client and server
 - **Code Organization**: Monorepo structure with shared types and utilities
+
+### Deployment Configuration
+- **Build Command**: `npm run build` (builds both frontend and backend)
+- **Run Command**: `npm start` (uses NODE_ENV=production with built assets)
+- **Environment**: Production mode with optimized builds
+- **Port**: Server listens on all interfaces (0.0.0.0) for Replit deployment compatibility
 
 ## External Dependencies
 
