@@ -10,6 +10,15 @@ The application follows a three-phase development roadmap: Phase 1 focuses on co
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (August 20, 2025)
+
+### Fixed Major Issues
+- **Landing Page Routing**: Fixed root URL "/" to properly redirect to Landing page instead of Home page
+- **Popular Bags Filtering**: Enhanced getPopularBags() function to only show verified/pre-loaded bags, filtering out user-created "Custom" bags
+- **Authentication Flow**: Fixed "Save to My Bags" functionality with proper guest user handling and login prompts
+- **Pet Carrier Support**: Pet carrier checkbox in manual entry form controls both filtering and bag creation
+- **User Bag Management**: Resolved "My Bags" dropdown errors for unauthenticated users
+
 ## System Architecture
 
 ### Frontend Architecture

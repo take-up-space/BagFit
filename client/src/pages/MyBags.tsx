@@ -98,6 +98,7 @@ export default function MyBags() {
         widthCm,
         heightCm,
         isPetCarrier: bagData.isPetCarrier,
+        isVerified: false,
       });
       
       const bag = await bagResponse.json();

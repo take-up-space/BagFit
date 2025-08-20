@@ -106,10 +106,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPopularBags(): Promise<Bag[]> {
-    // Only return verified bags or bags that were pre-loaded (not user-created custom bags)
-    // We can identify popular bags by filtering out ones that have unusual brand names like "Custom Manual Entry"
+    // Only return verified/popular bags that were pre-loaded in the system
+    // Filter out any user-created bags (typically have "Custom" brand or were created recently)
     return await db.select().from(bags)
-      .where(ne(bags.brand, 'Custom Manual Entry'))
+      .where(and(
+        ne(bags.brand, 'Custom Manual Entry'),
+        ne(bags.brand, 'Custom'),
+        eq(bags.isVerified, true)
+      ))
       .orderBy(bags.brand, bags.model);
   }
 

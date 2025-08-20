@@ -66,12 +66,13 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
     mutationFn: async () => {
       // Create bag and add to user collection
       const bagResponse = await apiRequest("POST", "/api/bags", {
-        brand: "Custom",
-        model: "Manual Entry",
+        brand: "Custom Manual Entry",
+        model: "User Bag",
         lengthCm: result.bagDimensions.lengthCm,
         widthCm: result.bagDimensions.widthCm,
         heightCm: result.bagDimensions.heightCm,
         isPetCarrier: result.isPetCarrier,
+        isVerified: false,
       });
       
       const bag = await bagResponse.json();
