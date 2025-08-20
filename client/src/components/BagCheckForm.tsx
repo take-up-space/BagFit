@@ -90,26 +90,22 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
     meta: { on401: "returnNull" },
   });
 
-  // NUCLEAR CACHE BUST: Completely rewrite query implementation
-  const { data: knownBags = [] } = useQuery<KnownBag[]>({
-    queryKey: ["/api/bags", "nuclear-cache-bust-" + Math.random().toString(36)],
-    queryFn: async () => {
-      const timestamp = new Date().getTime();
-      const response = await fetch(`/api/bags?v=${timestamp}&bust=${Math.random()}`);
-      const data = await response.json();
-      console.log('🚨 NUCLEAR CACHE BUST: Fetched bags count:', data.length, 'First bag:', data[0]?.brand);
-      return data;
-    },
+  // CACHE BUST: Use unique query key to force fresh data
+  const cacheBustKey = `cache-bust-${Date.now()}-${Math.random().toString(36)}`;
+  const { data: knownBags = [], isLoading: isLoadingKnownBags } = useQuery<KnownBag[]>({
+    queryKey: ["/api/bags", cacheBustKey],
     retry: false,
-    refetchOnWindowFocus: true,
     staleTime: 0,
     gcTime: 0,
   });
 
-  // NUCLEAR DEBUG: Log state for production debugging  
+  // DEBUG: Log state for production debugging  
   useEffect(() => {
-    console.log('🚨 DEPLOYMENT DEBUG - isPetCarrier:', isPetCarrier, 'knownBags.length:', knownBags.length);
-  }, [isPetCarrier, knownBags]);
+    console.log('CACHE BUST DEBUG - isPetCarrier:', isPetCarrier, 'knownBags.length:', knownBags.length, 'loading:', isLoadingKnownBags);
+    if (knownBags.length > 0) {
+      console.log('First bag:', knownBags[0].brand, knownBags[0].model);
+    }
+  }, [isPetCarrier, knownBags, isLoadingKnownBags]);
 
   // Bag check mutation
   const checkBagMutation = useMutation({
