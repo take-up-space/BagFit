@@ -189,28 +189,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const { userBagId } = req.params;
-      
-      // Development environment logging (ignore phantom requests in dev)
-      if (!req.body || Object.keys(req.body).length === 0) {
-        console.log("⚠️ Empty request body (dev environment issue) - ignoring");
-        return res.status(400).json({ message: "Empty request body" });
-      }
-      
       const updateSchema = z.object({
-        customName: z.string().optional(),
+        customName: z.string().min(1, "Custom name is required"),
         isPetCarrier: z.boolean().optional()
       });
       
       const updateData = updateSchema.parse(req.body);
-      
-      // Validate that at least one field is provided
-      if (!updateData.customName && updateData.isPetCarrier === undefined) {
-        return res.status(400).json({ message: "At least one field must be provided for update" });
-      }
-      
-      console.log("✅ Valid update request:", { userId, userBagId, updateData });
       const updatedUserBag = await storage.updateUserBag(userId, userBagId, updateData);
-      console.log("✅ Update successful:", updatedUserBag);
       res.json(updatedUserBag);
     } catch (error) {
       console.error("Error updating user bag:", error);

@@ -1,7 +1,6 @@
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-// v2.2.0 CACHE-BUSTING FIX  
 import airplaneSeatIcon from "@assets/AirplaneChair_Icon_1755563723564.png";
 
 export default function Landing() {
