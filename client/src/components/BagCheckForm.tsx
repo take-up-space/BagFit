@@ -90,10 +90,9 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
     meta: { on401: "returnNull" },
   });
 
-  // CACHE BUST: Use unique query key to force fresh data
-  const cacheBustKey = `cache-bust-${Date.now()}-${Math.random().toString(36)}`;
+  // CACHE BUST: Static unique key per session to force fresh data
   const { data: knownBags = [], isLoading: isLoadingKnownBags } = useQuery<KnownBag[]>({
-    queryKey: ["/api/bags", cacheBustKey],
+    queryKey: ["/api/bags", "session-cache-bust-v3"],
     retry: false,
     staleTime: 0,
     gcTime: 0,
