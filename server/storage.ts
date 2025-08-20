@@ -146,6 +146,7 @@ export class DatabaseStorage implements IStorage {
         userId: userBags.userId,
         bagId: userBags.bagId,
         customName: userBags.customName,
+        isPetCarrier: userBags.isPetCarrier,
         createdAt: userBags.createdAt,
         bag: bags,
       })
@@ -164,41 +165,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUserBag(userId: string, userBagId: string, updateData: { customName?: string; isPetCarrier?: boolean }): Promise<UserBag> {
-    // Get the current user bag first
-    const [currentUserBag] = await db
-      .select()
-      .from(userBags)
-      .where(and(eq(userBags.userId, userId), eq(userBags.id, userBagId)))
-      .limit(1);
-
-    if (!currentUserBag) {
-      throw new Error("User bag not found");
-    }
-
     // Build the update object conditionally
     const userBagUpdate: any = {};
     if (updateData.customName !== undefined) {
       userBagUpdate.customName = updateData.customName;
     }
-
-    // Update the user bag if there are changes
-    let updatedUserBag = currentUserBag;
-    if (Object.keys(userBagUpdate).length > 0) {
-      [updatedUserBag] = await db
-        .update(userBags)
-        .set(userBagUpdate)
-        .where(and(eq(userBags.userId, userId), eq(userBags.id, userBagId)))
-        .returning();
+    if (updateData.isPetCarrier !== undefined) {
+      userBagUpdate.isPetCarrier = updateData.isPetCarrier;
     }
 
-    // If isPetCarrier is provided, also update the underlying bag record
-    if (updateData.isPetCarrier !== undefined) {
-      await db
-        .update(bags)
-        .set({
-          isPetCarrier: updateData.isPetCarrier
-        })
-        .where(eq(bags.id, updatedUserBag.bagId));
+    // Update the user bag with the user's personal preferences
+    const [updatedUserBag] = await db
+      .update(userBags)
+      .set(userBagUpdate)
+      .where(and(eq(userBags.userId, userId), eq(userBags.id, userBagId)))
+      .returning();
+
+    if (!updatedUserBag) {
+      throw new Error("User bag not found");
     }
 
     return updatedUserBag;
