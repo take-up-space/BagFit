@@ -182,11 +182,20 @@ export default function MyBags() {
   });
 
   const updateBagNameMutation = useMutation({
-    mutationFn: async ({ userBagId, customName, isPetCarrier }: { userBagId: string; customName: string; isPetCarrier?: boolean }) => {
-      const updateData: any = { customName };
+    mutationFn: async ({ userBagId, customName, isPetCarrier }: { userBagId: string; customName?: string; isPetCarrier?: boolean }) => {
+      const updateData: any = {};
+      
+      // Include customName if provided
+      if (customName !== undefined) {
+        updateData.customName = customName;
+      }
+      
+      // Include isPetCarrier if provided  
       if (isPetCarrier !== undefined) {
         updateData.isPetCarrier = isPetCarrier;
       }
+      
+      console.log("API Request Data:", updateData);
       const response = await apiRequest("PATCH", `/api/user/bags/${userBagId}`, updateData);
       return await response.json();
     },
