@@ -100,11 +100,14 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
 
   // DEBUG: Log state for production debugging  
   useEffect(() => {
-    console.log('DEBUG - isPetCarrier:', isPetCarrier, 'knownBags.length:', knownBags.length, 'loading:', isLoadingKnownBags);
-    if (knownBags.length > 0) {
+    console.log('MAIN DEBUG - isPetCarrier:', isPetCarrier, 'knownBags type:', typeof knownBags, 'knownBags.length:', knownBags?.length, 'loading:', isLoadingKnownBags);
+    console.log('Raw knownBags data:', knownBags);
+    if (Array.isArray(knownBags) && knownBags.length > 0) {
       console.log('First bag:', knownBags[0]);
       console.log('Pet carrier bags:', knownBags.filter(b => b.isPetCarrier).length);
       console.log('Non-pet carrier bags:', knownBags.filter(b => !b.isPetCarrier).length);
+    } else {
+      console.log('ERROR: knownBags is not a valid array:', knownBags);
     }
   }, [isPetCarrier, knownBags, isLoadingKnownBags]);
 
