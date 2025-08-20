@@ -235,7 +235,8 @@ export default function MyBags() {
     setEditingBagId(userBag.id);
     setEditingBagName(userBag.customName);
     // Use user's personal preference if set, otherwise default to bag's isPetCarrier
-    setEditingBagIsPetCarrier(userBag.isPetCarrier !== null ? userBag.isPetCarrier : userBag.bag.isPetCarrier);
+    const userBagWithPetCarrier = userBag as any; // Type assertion for new field
+    setEditingBagIsPetCarrier(userBagWithPetCarrier.isPetCarrier !== null ? userBagWithPetCarrier.isPetCarrier : userBag.bag.isPetCarrier);
   };
 
   const handleSaveBagName = () => {
@@ -669,7 +670,7 @@ export default function MyBags() {
                   <p className="text-sm text-gray-600" data-testid={`text-bag-brand-${userBag.id}`}>
                     {userBag.bag.brand} {userBag.bag.model}
                   </p>
-                  {(userBag.isPetCarrier !== null ? userBag.isPetCarrier : userBag.bag.isPetCarrier) && (
+                  {((userBag as any).isPetCarrier !== null ? (userBag as any).isPetCarrier : userBag.bag.isPetCarrier) && (
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-800">
                       <i className="fas fa-paw mr-1"></i>Pet Carrier
                     </span>
