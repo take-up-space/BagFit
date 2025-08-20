@@ -190,7 +190,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const { userBagId } = req.params;
       
-      console.log("Update request body:", JSON.stringify(req.body, null, 2));
+      console.log("=== BACKEND DEBUG ===");
+      console.log("Raw req.body:", req.body);
+      console.log("Request body JSON:", JSON.stringify(req.body, null, 2));
+      console.log("Request headers:", req.headers['content-type']);
       
       const updateSchema = z.object({
         customName: z.string().optional(),

@@ -240,20 +240,28 @@ export default function MyBags() {
 
   const handleSaveBagName = () => {
     if (editingBagId) {
-      const mutationParams: any = {
-        userBagId: editingBagId,
-      };
+      // Fix: Send the data fields directly, not wrapped in mutation params
+      const updateFields: any = {};
       
       // Always include isPetCarrier since it's a boolean state
-      mutationParams.isPetCarrier = editingBagIsPetCarrier;
+      updateFields.isPetCarrier = editingBagIsPetCarrier;
       
       // Include customName if it has content
       if (editingBagName && editingBagName.trim()) {
-        mutationParams.customName = editingBagName.trim();
+        updateFields.customName = editingBagName.trim();
       }
       
-      console.log("Sending mutation params:", mutationParams);
-      updateBagNameMutation.mutate(mutationParams);
+      console.log("=== FRONTEND DEBUG ===");
+      console.log("editingBagId:", editingBagId);
+      console.log("editingBagName:", editingBagName);
+      console.log("editingBagIsPetCarrier:", editingBagIsPetCarrier);
+      console.log("updateFields being sent:", updateFields);
+      
+      updateBagNameMutation.mutate({
+        userBagId: editingBagId,
+        customName: updateFields.customName,
+        isPetCarrier: updateFields.isPetCarrier
+      });
     }
   };
 
