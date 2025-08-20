@@ -6,6 +6,17 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Nuclear cache-busting headers
+app.use((req, res, next) => {
+  if (req.url.includes('/assets/') || req.url.includes('.js') || req.url.includes('.css')) {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    res.set('ETag', Date.now().toString());
+  }
+  next();
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;

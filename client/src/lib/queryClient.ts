@@ -41,13 +41,32 @@ export const getQueryFn: <T>(options: {
     return await res.json();
   };
 
+// Add version to cache keys to force cache invalidation
+const APP_VERSION = Date.now().toString();
+
+const versionedQueryFn: QueryFunction = async ({ queryKey }) => {
+  const versionedKey = [...queryKey, 'v' + APP_VERSION];
+  const res = await fetch(versionedKey.slice(0, -1).join("/") as string, {
+    credentials: "include",
+    cache: "no-store",
+    headers: {
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache'
+    }
+  });
+
+  await throwIfResNotOk(res);
+  return await res.json();
+};
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      queryFn: getQueryFn({ on401: "throw" }),
+      queryFn: versionedQueryFn,
       refetchInterval: false,
       refetchOnWindowFocus: false,
-      staleTime: Infinity,
+      staleTime: 0, // Force fresh data
+      gcTime: 0, // Don't cache data
       retry: false,
     },
     mutations: {
