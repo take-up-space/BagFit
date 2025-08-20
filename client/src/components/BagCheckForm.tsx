@@ -364,7 +364,6 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                   </SelectTrigger>
                   <SelectContent>
                     {knownBags
-                      .filter((bag: KnownBag) => !isPetCarrier || bag.isPetCarrier)
                       .map((bag: KnownBag) => (
                         <SelectItem key={bag.id} value={bag.id} data-testid={`option-known-bag-${bag.id}`}>
                           <div className="flex items-center justify-between w-full">
