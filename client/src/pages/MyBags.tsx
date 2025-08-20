@@ -55,6 +55,7 @@ export default function MyBags() {
   });
   const [editingBagId, setEditingBagId] = useState<string | null>(null);
   const [editingBagName, setEditingBagName] = useState("");
+  const [editingBagIsPetCarrier, setEditingBagIsPetCarrier] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -181,16 +182,19 @@ export default function MyBags() {
   });
 
   const updateBagNameMutation = useMutation({
-    mutationFn: async ({ userBagId, customName }: { userBagId: string; customName: string }) => {
-      const response = await apiRequest("PATCH", `/api/user/bags/${userBagId}`, {
-        customName,
-      });
+    mutationFn: async ({ userBagId, customName, isPetCarrier }: { userBagId: string; customName: string; isPetCarrier?: boolean }) => {
+      const updateData: any = { customName };
+      if (isPetCarrier !== undefined) {
+        updateData.isPetCarrier = isPetCarrier;
+      }
+      const response = await apiRequest("PATCH", `/api/user/bags/${userBagId}`, updateData);
       return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user/bags"] });
       setEditingBagId(null);
       setEditingBagName("");
+      setEditingBagIsPetCarrier(false);
       toast({
         title: "Success",
         description: "Bag name updated successfully!",
@@ -219,6 +223,7 @@ export default function MyBags() {
   const handleEditBagName = (userBag: UserBag) => {
     setEditingBagId(userBag.id);
     setEditingBagName(userBag.customName);
+    setEditingBagIsPetCarrier(userBag.bag.isPetCarrier);
   };
 
   const handleSaveBagName = () => {
@@ -226,6 +231,7 @@ export default function MyBags() {
       updateBagNameMutation.mutate({
         userBagId: editingBagId,
         customName: editingBagName.trim(),
+        isPetCarrier: editingBagIsPetCarrier,
       });
     }
   };
@@ -233,6 +239,7 @@ export default function MyBags() {
   const handleCancelEdit = () => {
     setEditingBagId(null);
     setEditingBagName("");
+    setEditingBagIsPetCarrier(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -547,7 +554,7 @@ export default function MyBags() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     {editingBagId === userBag.id ? (
-                      <div className="flex items-center space-x-2 flex-1">
+                      <div className="flex flex-col space-y-2 flex-1">
                         <Input
                           value={editingBagName}
                           onChange={(e) => setEditingBagName(e.target.value)}
@@ -561,7 +568,21 @@ export default function MyBags() {
                             }
                           }}
                         />
-                        <Button
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={`pet-carrier-${userBag.id}`}
+                            checked={editingBagIsPetCarrier}
+                            onChange={(e) => setEditingBagIsPetCarrier(e.target.checked)}
+                            className="h-4 w-4 text-airline-blue focus:ring-airline-blue border-gray-300 rounded"
+                            data-testid={`checkbox-pet-carrier-${userBag.id}`}
+                          />
+                          <Label htmlFor={`pet-carrier-${userBag.id}`} className="text-sm text-gray-700">
+                            Pet Carrier?
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Button
                           variant="ghost"
                           size="sm"
                           onClick={handleSaveBagName}
@@ -580,6 +601,7 @@ export default function MyBags() {
                         >
                           <i className="fas fa-times"></i>
                         </Button>
+                        </div>
                       </div>
                     ) : (
                       <>
