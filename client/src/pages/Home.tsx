@@ -4,7 +4,6 @@ import { Link } from "wouter";
 import BagCheckForm from "@/components/BagCheckForm";
 import Sidebar from "@/components/Sidebar";
 import AirlineReference from "@/components/AirlineReference";
-// v2.2.0 CACHE-BUSTING FIX
 import airplaneSeatIcon from "@assets/AirplaneChair_Icon_1755563723564.png";
 
 export default function Home() {

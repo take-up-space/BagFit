@@ -1,5 +1,5 @@
-/* v2.2.0 CACHE-BUSTING FIX */
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -52,8 +52,8 @@
   --shadow-2xl: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
-
-  /* Custom airline-specific colors - Cache Bust v2.2.0 */
+  
+  /* Custom airline-specific colors */
   --airline-blue: hsl(207, 73%, 42%);
   --success-green: hsl(122, 39%, 49%);
   --error-red: hsl(4, 90%, 58%);
@@ -157,7 +157,7 @@ textarea::placeholder {
   --shadow-lg: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 4px 6px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
   --shadow-xl: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 8px 10px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
   --shadow-2xl: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-
+  
   /* Custom airline-specific colors for dark mode */
   --airline-blue: hsl(207, 73%, 52%);
   --success-green: hsl(122, 39%, 59%);
@@ -185,51 +185,51 @@ textarea::placeholder {
   .text-airline-blue {
     color: var(--airline-blue);
   }
-
+  
   .bg-airline-blue {
     background-color: var(--airline-blue);
   }
-
+  
   .border-airline-blue {
     border-color: var(--airline-blue);
   }
-
+  
   .text-success-green {
     color: var(--success-green);
   }
-
+  
   .bg-success-green {
     background-color: var(--success-green);
   }
-
+  
   .text-error-red {
     color: var(--error-red);
   }
-
+  
   .bg-error-red {
     background-color: var(--error-red);
   }
-
+  
   .text-warning-orange {
     color: var(--warning-orange);
   }
-
+  
   .bg-warning-orange {
     background-color: var(--warning-orange);
   }
-
+  
   .text-verified-blue {
     color: var(--verified-blue);
   }
-
+  
   .bg-verified-blue {
     background-color: var(--verified-blue);
   }
-
+  
   .text-unverified-gray {
     color: var(--unverified-gray);
   }
-
+  
   .bg-unverified-gray {
     background-color: var(--unverified-gray);
   }

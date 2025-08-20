@@ -89,7 +89,6 @@ export const userBags = pgTable("user_bags", {
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   bagId: varchar("bag_id").notNull().references(() => bags.id, { onDelete: "cascade" }),
   customName: varchar("custom_name"),
-  isPetCarrier: boolean("is_pet_carrier"), // User's personal override for pet carrier status
   createdAt: timestamp("created_at").defaultNow(),
 });
 

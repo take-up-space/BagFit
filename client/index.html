@@ -13,46 +13,6 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    
-    <!-- Service Worker Registration - Cache Busting v2.2.0 -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js', { scope: '/' })
-          .then(registration => {
-            console.log('[SW] Registration successful:', registration);
-            
-            // Force update check
-            registration.update();
-            
-            // Listen for service worker messages
-            navigator.serviceWorker.addEventListener('message', event => {
-              if (event.data && event.data.type === 'FORCE_REFRESH') {
-                console.log('[SW] Force refreshing page');
-                window.location.reload(true);
-              }
-            });
-            
-            // Check for waiting service worker and activate immediately
-            if (registration.waiting) {
-              registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-            }
-            
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('[SW] New version available, refreshing...');
-                  window.location.reload(true);
-                }
-              });
-            });
-          })
-          .catch(error => {
-            console.log('[SW] Registration failed:', error);
-          });
-      }
-    </script>
-    
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
   </body>
