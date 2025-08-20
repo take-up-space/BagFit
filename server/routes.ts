@@ -189,18 +189,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const { userBagId } = req.params;
+      
+      console.log("Update request body:", JSON.stringify(req.body, null, 2));
+      
       const updateSchema = z.object({
         customName: z.string().optional(),
         isPetCarrier: z.boolean().optional()
-      }).refine(data => {
-        const hasCustomName = data.customName !== undefined && data.customName.trim().length > 0;
-        const hasPetCarrierUpdate = data.isPetCarrier !== undefined;
-        return hasCustomName || hasPetCarrierUpdate;
-      }, {
-        message: "Either customName or isPetCarrier must be provided"
       });
       
       const updateData = updateSchema.parse(req.body);
+      
+      // Validate that at least one field is provided
+      if (!updateData.customName && updateData.isPetCarrier === undefined) {
+        return res.status(400).json({ message: "At least one field must be provided for update" });
+      }
+      
       const updatedUserBag = await storage.updateUserBag(userId, userBagId, updateData);
       res.json(updatedUserBag);
     } catch (error) {

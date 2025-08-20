@@ -230,14 +230,17 @@ export default function MyBags() {
     if (editingBagId) {
       const updateData: any = {
         userBagId: editingBagId,
-        isPetCarrier: editingBagIsPetCarrier,
       };
       
-      // Only include customName if it has content
-      if (editingBagName.trim()) {
+      // Always include isPetCarrier since it's a boolean state
+      updateData.isPetCarrier = editingBagIsPetCarrier;
+      
+      // Include customName if it has content
+      if (editingBagName && editingBagName.trim()) {
         updateData.customName = editingBagName.trim();
       }
       
+      console.log("Sending update data:", updateData);
       updateBagNameMutation.mutate(updateData);
     }
   };
