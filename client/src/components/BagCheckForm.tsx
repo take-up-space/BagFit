@@ -90,9 +90,9 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
     meta: { on401: "returnNull" },
   });
 
-  // PRODUCTION CACHE-BUSTING: Custom fetch with timestamp to avoid deployment caching
+  // PRODUCTION CACHE-BUSTING: Fixed static cache key with timestamp in URL only
   const { data: knownBags = [], isLoading: isLoadingKnownBags, error: knownBagsError } = useQuery<KnownBag[]>({
-    queryKey: ["/api/bags", "cache-bust-v5", Date.now()],
+    queryKey: ["/api/bags", "cache-bust-v5-fixed"],
     queryFn: async () => {
       const timestamp = Date.now();
       const response = await fetch(`/api/bags?_cb=${timestamp}`);
@@ -101,23 +101,20 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
       return data;
     },
     retry: false,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  // DEBUG: Log state for production debugging  
+  // DEBUG: Log state only once per data change
   useEffect(() => {
-    console.log('MAIN DEBUG - isPetCarrier:', isPetCarrier, 'knownBags type:', typeof knownBags, 'knownBags.length:', knownBags?.length, 'loading:', isLoadingKnownBags, 'error:', knownBagsError);
-    if (knownBagsError) console.log('ERROR DETAILS:', knownBagsError);
-    console.log('Raw knownBags data:', knownBags);
-    if (Array.isArray(knownBags) && knownBags.length > 0) {
-      console.log('First bag:', knownBags[0]);
-      console.log('Pet carrier bags:', knownBags.filter(b => b.isPetCarrier).length);
-      console.log('Non-pet carrier bags:', knownBags.filter(b => !b.isPetCarrier).length);
-    } else {
-      console.log('ERROR: knownBags is not a valid array:', knownBags);
+    if (!isLoadingKnownBags) {
+      console.log('MAIN DEBUG - isPetCarrier:', isPetCarrier, 'knownBags.length:', knownBags?.length, 'error:', knownBagsError);
+      if (Array.isArray(knownBags) && knownBags.length > 0) {
+        console.log('Pet carrier bags:', knownBags.filter(b => b.isPetCarrier).length);
+        console.log('Non-pet carrier bags:', knownBags.filter(b => !b.isPetCarrier).length);
+      }
     }
-  }, [isPetCarrier, knownBags, isLoadingKnownBags, knownBagsError]);
+  }, [knownBags, isLoadingKnownBags, knownBagsError]);
 
   // Bag check mutation
   const checkBagMutation = useMutation({
