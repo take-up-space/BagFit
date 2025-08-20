@@ -190,7 +190,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const { userBagId } = req.params;
       const updateSchema = z.object({
-        customName: z.string().min(1, "Custom name is required")
+        customName: z.string().min(1, "Custom name is required"),
+        isPetCarrier: z.boolean().optional()
       });
       
       const updateData = updateSchema.parse(req.body);

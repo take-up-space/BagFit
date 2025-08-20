@@ -163,7 +163,8 @@ export class DatabaseStorage implements IStorage {
     return newUserBag;
   }
 
-  async updateUserBag(userId: string, userBagId: string, updateData: { customName: string }): Promise<UserBag> {
+  async updateUserBag(userId: string, userBagId: string, updateData: { customName: string; isPetCarrier?: boolean }): Promise<UserBag> {
+    // First update the user bag name
     const [updatedUserBag] = await db
       .update(userBags)
       .set({ 
@@ -171,6 +172,17 @@ export class DatabaseStorage implements IStorage {
       })
       .where(and(eq(userBags.userId, userId), eq(userBags.id, userBagId)))
       .returning();
+
+    // If isPetCarrier is provided, also update the underlying bag record
+    if (updateData.isPetCarrier !== undefined && updatedUserBag) {
+      await db
+        .update(bags)
+        .set({
+          isPetCarrier: updateData.isPetCarrier
+        })
+        .where(eq(bags.id, updatedUserBag.bagId));
+    }
+
     return updatedUserBag;
   }
 
