@@ -22,7 +22,7 @@ import { eq, and, desc } from "drizzle-orm";
 export interface IStorage {
   // User operations (required for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
-  upsertUser(user: UpsertUser): Promise<User>;
+  upsertUser(user: UpsertUser & { id: string }): Promise<User>;
   
   // Airline operations
   getAllAirlines(): Promise<Airline[]>;
@@ -54,7 +54,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async upsertUser(userData: UpsertUser): Promise<User> {
+  async upsertUser(userData: UpsertUser & { id: string }): Promise<User> {
     const [user] = await db
       .insert(users)
       .values(userData)
