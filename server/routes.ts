@@ -190,14 +190,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const { userBagId } = req.params;
       
-      console.log("=== BACKEND DEBUG ===");
-      console.log("Raw req.body:", req.body);
-      console.log("Request body JSON:", JSON.stringify(req.body, null, 2));
-      console.log("Request headers:", req.headers['content-type']);
-      console.log("Request URL:", req.url);
-      console.log("Request method:", req.method);
-      console.log("User agent:", req.headers['user-agent']);
-      console.log("Stack trace:", new Error().stack);
+      // CRITICAL FIX: Block empty/phantom requests
+      if (!req.body || Object.keys(req.body).length === 0) {
+        console.log("❌ BLOCKING PHANTOM REQUEST - empty body from:", req.headers['user-agent']?.substring(0, 50));
+        return res.status(400).json({ message: "Empty request body not allowed" });
+      }
       
       const updateSchema = z.object({
         customName: z.string().optional(),

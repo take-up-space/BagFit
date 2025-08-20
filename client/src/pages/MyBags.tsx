@@ -183,12 +183,8 @@ export default function MyBags() {
 
   const updateBagNameMutation = useMutation({
     mutationFn: async ({ userBagId, customName, isPetCarrier }: { userBagId: string; customName?: string; isPetCarrier?: boolean }) => {
-      console.log("🚨 MUTATION CALLED! Params:", { userBagId, customName, isPetCarrier });
-      console.log("🚨 STACK TRACE:", new Error().stack);
-      
       // SAFETY CHECK: Do not proceed with empty/invalid data
       if (!userBagId || (customName === undefined && isPetCarrier === undefined)) {
-        console.error("❌ BLOCKING EMPTY MUTATION - invalid parameters");
         throw new Error("Invalid mutation parameters");
       }
       
@@ -203,9 +199,6 @@ export default function MyBags() {
       if (isPetCarrier !== undefined) {
         updateData.isPetCarrier = isPetCarrier;
       }
-      
-      console.log("Mutation params received:", { userBagId, customName, isPetCarrier });
-      console.log("API Request Data being sent:", updateData);
       
       const response = await apiRequest("PATCH", `/api/user/bags/${userBagId}`, updateData);
       return await response.json();
@@ -261,17 +254,7 @@ export default function MyBags() {
         updateFields.customName = editingBagName.trim();
       }
       
-      console.log("=== FRONTEND DEBUG ===");
-      console.log("editingBagId:", editingBagId);
-      console.log("editingBagName:", editingBagName);
-      console.log("editingBagIsPetCarrier:", editingBagIsPetCarrier);
-      console.log("updateFields being sent:", updateFields);
-      
-      console.log("🔥 About to call mutation with:", {
-        userBagId: editingBagId,
-        customName: updateFields.customName,
-        isPetCarrier: updateFields.isPetCarrier
-      });
+
       
       updateBagNameMutation.mutate({
         userBagId: editingBagId,
@@ -606,10 +589,8 @@ export default function MyBags() {
                           className="text-lg font-semibold"
                           data-testid={`input-edit-bag-name-${userBag.id}`}
                           onKeyDown={(e) => {
-                            console.log("🔥 KEY PRESSED:", e.key);
                             if (e.key === 'Enter') {
                               e.preventDefault();
-                              console.log("🔥 ENTER KEY TRIGGERED SAVE");
                               handleSaveBagName();
                             } else if (e.key === 'Escape') {
                               e.preventDefault();
@@ -634,10 +615,7 @@ export default function MyBags() {
                           <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => {
-                            console.log("=== SAVE BUTTON CLICKED ===");
-                            handleSaveBagName();
-                          }}
+                          onClick={handleSaveBagName}
                           disabled={updateBagNameMutation.isPending}
                           className="text-green-600 hover:text-green-700 hover:bg-green-50"
                           data-testid={`button-save-name-${userBag.id}`}
