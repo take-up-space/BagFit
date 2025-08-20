@@ -197,6 +197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Request URL:", req.url);
       console.log("Request method:", req.method);
       console.log("User agent:", req.headers['user-agent']);
+      console.log("Stack trace:", new Error().stack);
       
       const updateSchema = z.object({
         customName: z.string().optional(),

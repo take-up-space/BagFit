@@ -184,6 +184,13 @@ export default function MyBags() {
   const updateBagNameMutation = useMutation({
     mutationFn: async ({ userBagId, customName, isPetCarrier }: { userBagId: string; customName?: string; isPetCarrier?: boolean }) => {
       console.log("🚨 MUTATION CALLED! Params:", { userBagId, customName, isPetCarrier });
+      console.log("🚨 STACK TRACE:", new Error().stack);
+      
+      // SAFETY CHECK: Do not proceed with empty/invalid data
+      if (!userBagId || (customName === undefined && isPetCarrier === undefined)) {
+        console.error("❌ BLOCKING EMPTY MUTATION - invalid parameters");
+        throw new Error("Invalid mutation parameters");
+      }
       
       const updateData: any = {};
       
@@ -599,9 +606,13 @@ export default function MyBags() {
                           className="text-lg font-semibold"
                           data-testid={`input-edit-bag-name-${userBag.id}`}
                           onKeyDown={(e) => {
+                            console.log("🔥 KEY PRESSED:", e.key);
                             if (e.key === 'Enter') {
+                              e.preventDefault();
+                              console.log("🔥 ENTER KEY TRIGGERED SAVE");
                               handleSaveBagName();
                             } else if (e.key === 'Escape') {
+                              e.preventDefault();
                               handleCancelEdit();
                             }
                           }}
