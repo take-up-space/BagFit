@@ -13,11 +13,12 @@ Preferred communication style: Simple, everyday language.
 ## Recent Changes (August 20, 2025)
 
 ### Fixed Major Issues
-- **Landing Page Routing**: Fixed root URL "/" to properly redirect to Landing page instead of Home page
-- **Popular Bags Filtering**: Enhanced getPopularBags() function to only show verified/pre-loaded bags, filtering out user-created "Custom" bags
-- **Authentication Flow**: Fixed "Save to My Bags" functionality with proper guest user handling and login prompts
+- **Landing Page Routing**: Fixed root URL "/" to properly show Landing page; added "/home" route for main app functionality
+- **Navigation Flow**: Fixed all navigation buttons ("Try as Guest", "Login", "Home") to properly route to "/home" instead of circular Landing page redirects
+- **Authentication Callback**: Updated login success redirect from "/" to "/home" so users land on functional app page after authentication
+- **Popular Bags Filtering**: Enhanced getPopularBags() function to only show verified/pre-loaded bags (96 bags), filtering out user-created "Custom" bags
 - **Pet Carrier Support**: Pet carrier checkbox in manual entry form controls both filtering and bag creation
-- **User Bag Management**: Resolved "My Bags" dropdown errors for unauthenticated users
+- **User Bag Management**: Resolved "My Bags" dropdown errors for unauthenticated users with proper authentication checks
 
 ## System Architecture
 

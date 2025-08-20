@@ -308,7 +308,7 @@ export default function MyBags() {
             </div>
             <div className="flex items-center space-x-4">
               <Link 
-                href="/"
+                href="/home"
                 className="text-gray-600 hover:text-airline-blue transition-colors"
                 data-testid="link-home"
               >
