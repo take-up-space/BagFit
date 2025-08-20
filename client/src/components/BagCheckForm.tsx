@@ -371,11 +371,20 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                 </div>
                 <Select value={selectedKnownBag} onValueChange={handleKnownBagSelect}>
                   <SelectTrigger data-testid="select-known-bag">
-                    <SelectValue placeholder={`Choose from ${knownBags.length} popular bag models...`} />
+                    <SelectValue placeholder={(() => {
+                      const filteredBags = knownBags.filter((bag: KnownBag) => isPetCarrier ? bag.isPetCarrier : true);
+                      const count = filteredBags.length;
+                      if (count <= 20) {
+                        return `Choose from ${count} popular bag models...`;
+                      } else {
+                        const roundedDown = Math.floor(count / 10) * 10;
+                        return `Choose from ${roundedDown}+ popular bag models...`;
+                      }
+                    })()} />
                   </SelectTrigger>
                   <SelectContent>
                     {knownBags
-                      .filter((bag: KnownBag) => !isPetCarrier || bag.isPetCarrier)
+                      .filter((bag: KnownBag) => isPetCarrier ? bag.isPetCarrier : true)
                       .map((bag: KnownBag) => (
                         <SelectItem key={bag.id} value={bag.id} data-testid={`option-known-bag-${bag.id}`}>
                           <div className="flex items-center justify-between w-full">
