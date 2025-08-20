@@ -375,10 +375,21 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                     <SelectValue placeholder={(() => {
                       // v2.2.0 CACHE-BUSTING FIX: Filter bags based on pet carrier checkbox
                       const filteredBags = knownBags.filter((bag: KnownBag) => isPetCarrier ? bag.isPetCarrier : true);
-                      if (isPetCarrier) {
-                        return `Choose from ${filteredBags.length} pet carrier models... (v2.2.0-${Date.now().toString().slice(-6)})`;
+                      const count = filteredBags.length;
+                      
+                      // Smart Number Formatting
+                      let displayCount: string;
+                      if (count <= 20) {
+                        displayCount = count.toString();
                       } else {
-                        return `Choose from ${filteredBags.length}+ popular bag models... (v2.2.0-${Date.now().toString().slice(-6)})`;
+                        const roundedDown = Math.floor(count / 10) * 10;
+                        displayCount = `${roundedDown}+`;
+                      }
+                      
+                      if (isPetCarrier) {
+                        return `Choose from ${displayCount} pet carrier models... (v2.2.0-${Date.now().toString().slice(-6)})`;
+                      } else {
+                        return `Choose from ${displayCount} popular bag models... (v2.2.0-${Date.now().toString().slice(-6)})`;
                       }
                     })()} />
                   </SelectTrigger>
