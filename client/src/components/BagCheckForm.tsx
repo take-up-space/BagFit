@@ -373,7 +373,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                 <Select value={selectedKnownBag} onValueChange={handleKnownBagSelect}>
                   <SelectTrigger data-testid="select-known-bag">
                     <SelectValue placeholder={(() => {
-                      // CRITICAL FIX: Filter bags based on pet carrier checkbox (v2.1.0 DEPLOYMENT FIX)
+                      // v2.2.0 CACHE-BUSTING FIX: Filter bags based on pet carrier checkbox
                       const filteredBags = knownBags.filter((bag: KnownBag) => isPetCarrier ? bag.isPetCarrier : true);
                       const count = filteredBags.length;
                       if (count <= 20) {
@@ -387,7 +387,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                   <SelectContent>
                     {knownBags
                       .filter((bag: KnownBag) => {
-                        // 2025-08-20 DEPLOYMENT FIX: Pet carrier filter logic
+                        // v2.2.0 CACHE-BUSTING FIX: Pet carrier filter logic
                         return isPetCarrier ? bag.isPetCarrier : true;
                       })
                       .map((bag: KnownBag) => (
