@@ -134,7 +134,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
     // Validate bag dimensions - check if user has either selected a bag OR entered all dimensions
     const hasDimensions = dimensions.length && dimensions.width && dimensions.height;
     const hasSelectedBag = selectedKnownBag || selectedUserBag;
-    
+
     if (!hasDimensions && !hasSelectedBag) {
       errors.dimensions = "Please enter all bag dimensions or select a bag from the dropdown";
     } else if (hasDimensions) {
@@ -142,7 +142,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
       const length = parseFloat(dimensions.length);
       const width = parseFloat(dimensions.width);
       const height = parseFloat(dimensions.height);
-      
+
       if (isNaN(length) || length <= 0 || isNaN(width) || width <= 0 || isNaN(height) || height <= 0) {
         errors.dimensions = "All dimensions must be positive numbers";
       }
@@ -154,7 +154,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate form and show errors
     if (!validateForm()) {
       return;
@@ -213,7 +213,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
         const lengthInUnit = unit === "cm" ? parseFloat(knownBag.lengthCm) : cmToInches(parseFloat(knownBag.lengthCm));
         const widthInUnit = unit === "cm" ? parseFloat(knownBag.widthCm) : cmToInches(parseFloat(knownBag.widthCm));
         const heightInUnit = unit === "cm" ? parseFloat(knownBag.heightCm) : cmToInches(parseFloat(knownBag.heightCm));
-        
+
         setDimensions({ 
           length: lengthInUnit.toFixed(1), 
           width: widthInUnit.toFixed(1), 
@@ -238,7 +238,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
         const lengthInUnit = unit === "cm" ? parseFloat(userBag.bag.lengthCm) : cmToInches(parseFloat(userBag.bag.lengthCm));
         const widthInUnit = unit === "cm" ? parseFloat(userBag.bag.widthCm) : cmToInches(parseFloat(userBag.bag.widthCm));
         const heightInUnit = unit === "cm" ? parseFloat(userBag.bag.heightCm) : cmToInches(parseFloat(userBag.bag.heightCm));
-        
+
         setDimensions({ 
           length: lengthInUnit.toFixed(1), 
           width: widthInUnit.toFixed(1), 
@@ -308,7 +308,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-8">
-            
+
             {/* Step 1: Airline Selection */}
             <div>
               <h3 className="text-lg font-medium text-gray-800 mb-4 flex items-center">
@@ -340,7 +340,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                     </p>
                   )}
                 </div>
-                
+
               </div>
             </div>
 
@@ -350,7 +350,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                 <span className="bg-airline-blue text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">2</span>
                 Choose Your Bag
               </h3>
-              
+
               {/* Select from Known Bags Database */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
@@ -375,12 +375,10 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                     <SelectValue placeholder={(() => {
                       // v2.2.0 CACHE-BUSTING FIX: Filter bags based on pet carrier checkbox
                       const filteredBags = knownBags.filter((bag: KnownBag) => isPetCarrier ? bag.isPetCarrier : true);
-                      const count = filteredBags.length;
-                      if (count <= 20) {
-                        return `Choose from ${count} popular bag models...`;
+                      if (isPetCarrier) {
+                        return `Choose from ${filteredBags.length} pet carrier models... (v2.2.0-${Date.now().toString().slice(-6)})`;
                       } else {
-                        const roundedDown = Math.floor(count / 10) * 10;
-                        return `Choose from ${roundedDown}+ popular bag models...`;
+                        return `Choose from ${filteredBags.length}+ popular bag models... (v2.2.0-${Date.now().toString().slice(-6)})`;
                       }
                     })()} />
                   </SelectTrigger>
@@ -404,7 +402,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               {/* Alternative: Select from My Bags */}
               {userBags.length > 0 && isAuthenticated && (
                 <>
@@ -444,7 +442,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
               )}
 
               <div className="text-center text-gray-500 text-sm mb-4">or enter manually</div>
-              
+
               {/* Unit Toggle */}
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center space-x-4">

@@ -53,7 +53,7 @@
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
-  /* Custom airline-specific colors */
+  /* Custom airline-specific colors - Cache Bust v2.2.0 */
   --airline-blue: hsl(207, 73%, 42%);
   --success-green: hsl(122, 39%, 49%);
   --error-red: hsl(4, 90%, 58%);
