@@ -117,7 +117,7 @@ export default function Home() {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Sidebar selectedAirlineCode={selectedAirlineCode} />
+            <Sidebar />
           </div>
         </div>
 

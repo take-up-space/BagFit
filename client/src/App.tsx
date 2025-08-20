@@ -14,7 +14,11 @@ function Router() {
 
   return (
     <Switch>
-      <Route path="/" component={Landing} />
+      <Route path="/" >
+        {isLoading ? <div>Loading...</div> : <Home />}
+      </Route>
+      <Route path="/welcome" component={Landing} />
+      <Route path="/landing" component={Landing} />
       <Route path="/check-bag">
         {isLoading ? <div>Loading...</div> : <Home />}
       </Route>

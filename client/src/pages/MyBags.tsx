@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import airplaneSeatIcon from "@assets/AirplaneChair_Icon_1755563723564.png";
 
 interface UserBag {
   id: string;
@@ -296,7 +297,11 @@ export default function MyBags() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <Link href="/" className="text-2xl font-bold text-airline-blue">
-                <i className="fas fa-plane mr-2"></i>BagFit
+                <img 
+                  src={airplaneSeatIcon} 
+                  alt="Airplane seat" 
+                  className="w-6 h-6 mr-2"
+                />BagFit
               </Link>
             </div>
             <div className="flex items-center space-x-4">

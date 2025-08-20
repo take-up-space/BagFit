@@ -40,7 +40,7 @@ export default function Landing() {
             Will Your Bag Fit Under the Seat in Front of You?
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Check your bag dimensions against airline underseat space requirements. 
+            Check your personal item dimensions against airline underseat space requirements. 
             Avoid surprises at the gate with verified airline data and save money on baggage fees.
           </p>
           
@@ -61,7 +61,7 @@ export default function Landing() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link 
-              href="/check-bag"
+              href="/"
               className="bg-airline-blue text-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors inline-flex items-center"
               data-testid="button-try-guest"
             >
