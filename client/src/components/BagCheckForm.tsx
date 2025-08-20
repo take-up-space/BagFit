@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -373,21 +373,30 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                 <Select value={selectedKnownBag} onValueChange={handleKnownBagSelect}>
                   <SelectTrigger data-testid="select-known-bag">
                     <SelectValue placeholder={(() => {
-                      // CRITICAL FIX: Filter bags based on pet carrier checkbox (v2.1.0 DEPLOYMENT FIX)
+                      // v2.2.0 CACHE-BUSTING FIX: Filter bags based on pet carrier checkbox
                       const filteredBags = knownBags.filter((bag: KnownBag) => isPetCarrier ? bag.isPetCarrier : true);
                       const count = filteredBags.length;
+                      
+                      // Smart Number Formatting
+                      let displayCount: string;
                       if (count <= 20) {
-                        return `Choose from ${count} popular bag models...`;
+                        displayCount = count.toString();
                       } else {
                         const roundedDown = Math.floor(count / 10) * 10;
-                        return `Choose from ${roundedDown}+ popular bag models...`;
+                        displayCount = `${roundedDown}+`;
+                      }
+                      
+                      if (isPetCarrier) {
+                        return `Choose from ${displayCount} pet carrier models...`;
+                      } else {
+                        return `Choose from ${displayCount} popular bag models...`;
                       }
                     })()} />
                   </SelectTrigger>
                   <SelectContent>
                     {knownBags
                       .filter((bag: KnownBag) => {
-                        // 2025-08-20 DEPLOYMENT FIX: Pet carrier filter logic
+                        // v2.2.0 CACHE-BUSTING FIX: Pet carrier filter logic
                         return isPetCarrier ? bag.isPetCarrier : true;
                       })
                       .map((bag: KnownBag) => (

@@ -182,11 +182,27 @@ export default function MyBags() {
   });
 
   const updateBagNameMutation = useMutation({
-    mutationFn: async ({ userBagId, customName, isPetCarrier }: { userBagId: string; customName: string; isPetCarrier?: boolean }) => {
-      const updateData: any = { customName };
+    mutationFn: async ({ userBagId, customName, isPetCarrier }: { userBagId: string; customName?: string; isPetCarrier?: boolean }) => {
+      console.log("🔄 Mutation executing with:", { userBagId, customName, isPetCarrier });
+      
+      // SAFETY CHECK: Do not proceed with empty/invalid data
+      if (!userBagId || (customName === undefined && isPetCarrier === undefined)) {
+        throw new Error("Invalid mutation parameters");
+      }
+      
+      const updateData: any = {};
+      
+      // Include customName if provided
+      if (customName !== undefined) {
+        updateData.customName = customName;
+      }
+      
+      // Include isPetCarrier if provided  
       if (isPetCarrier !== undefined) {
         updateData.isPetCarrier = isPetCarrier;
       }
+      
+      console.log("📤 Sending to API:", updateData);
       const response = await apiRequest("PATCH", `/api/user/bags/${userBagId}`, updateData);
       return await response.json();
     },
@@ -223,15 +239,23 @@ export default function MyBags() {
   const handleEditBagName = (userBag: UserBag) => {
     setEditingBagId(userBag.id);
     setEditingBagName(userBag.customName);
-    setEditingBagIsPetCarrier(userBag.bag.isPetCarrier);
+    // Use user's personal preference if set, otherwise default to bag's isPetCarrier
+    const userBagWithPetCarrier = userBag as any; // Type assertion for new field
+    setEditingBagIsPetCarrier(userBagWithPetCarrier.isPetCarrier !== null ? userBagWithPetCarrier.isPetCarrier : userBag.bag.isPetCarrier);
   };
 
   const handleSaveBagName = () => {
-    if (editingBagId && editingBagName.trim()) {
+    if (editingBagId) {
+      console.log("💾 Saving bag with:", {
+        userBagId: editingBagId,
+        customName: editingBagName?.trim() || undefined,
+        isPetCarrier: editingBagIsPetCarrier
+      });
+      
       updateBagNameMutation.mutate({
         userBagId: editingBagId,
-        customName: editingBagName.trim(),
-        isPetCarrier: editingBagIsPetCarrier,
+        customName: editingBagName?.trim() || undefined,
+        isPetCarrier: editingBagIsPetCarrier
       });
     }
   };
@@ -562,8 +586,10 @@ export default function MyBags() {
                           data-testid={`input-edit-bag-name-${userBag.id}`}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') {
+                              e.preventDefault();
                               handleSaveBagName();
                             } else if (e.key === 'Escape') {
+                              e.preventDefault();
                               handleCancelEdit();
                             }
                           }}
@@ -617,7 +643,10 @@ export default function MyBags() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleEditBagName(userBag)}
+                            onClick={() => {
+                              console.log("=== EDIT BUTTON CLICKED ===", userBag.id);
+                              handleEditBagName(userBag);
+                            }}
                             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                             data-testid={`button-edit-${userBag.id}`}
                           >
@@ -640,7 +669,7 @@ export default function MyBags() {
                   <p className="text-sm text-gray-600" data-testid={`text-bag-brand-${userBag.id}`}>
                     {userBag.bag.brand} {userBag.bag.model}
                   </p>
-                  {userBag.bag.isPetCarrier && (
+                  {((userBag as any).isPetCarrier !== null ? (userBag as any).isPetCarrier : userBag.bag.isPetCarrier) && (
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-800">
                       <i className="fas fa-paw mr-1"></i>Pet Carrier
                     </span>

@@ -146,6 +146,7 @@ export class DatabaseStorage implements IStorage {
         userId: userBags.userId,
         bagId: userBags.bagId,
         customName: userBags.customName,
+        isPetCarrier: userBags.isPetCarrier,
         createdAt: userBags.createdAt,
         bag: bags,
       })
@@ -163,24 +164,25 @@ export class DatabaseStorage implements IStorage {
     return newUserBag;
   }
 
-  async updateUserBag(userId: string, userBagId: string, updateData: { customName: string; isPetCarrier?: boolean }): Promise<UserBag> {
-    // First update the user bag name
+  async updateUserBag(userId: string, userBagId: string, updateData: { customName?: string; isPetCarrier?: boolean }): Promise<UserBag> {
+    // Build the update object conditionally
+    const userBagUpdate: any = {};
+    if (updateData.customName !== undefined) {
+      userBagUpdate.customName = updateData.customName;
+    }
+    if (updateData.isPetCarrier !== undefined) {
+      userBagUpdate.isPetCarrier = updateData.isPetCarrier;
+    }
+
+    // Update the user bag with the user's personal preferences
     const [updatedUserBag] = await db
       .update(userBags)
-      .set({ 
-        customName: updateData.customName
-      })
+      .set(userBagUpdate)
       .where(and(eq(userBags.userId, userId), eq(userBags.id, userBagId)))
       .returning();
 
-    // If isPetCarrier is provided, also update the underlying bag record
-    if (updateData.isPetCarrier !== undefined && updatedUserBag) {
-      await db
-        .update(bags)
-        .set({
-          isPetCarrier: updateData.isPetCarrier
-        })
-        .where(eq(bags.id, updatedUserBag.bagId));
+    if (!updatedUserBag) {
+      throw new Error("User bag not found");
     }
 
     return updatedUserBag;
