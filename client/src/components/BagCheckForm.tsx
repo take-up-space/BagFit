@@ -90,9 +90,9 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
     meta: { on401: "returnNull" },
   });
 
-  // CACHE BUST: Static unique key per session to force fresh data
+  // CACHE BUST: Use correct endpoint with cache-busting in query key only
   const { data: knownBags = [], isLoading: isLoadingKnownBags } = useQuery<KnownBag[]>({
-    queryKey: ["/api/bags", "session-cache-bust-v3"],
+    queryKey: ["/api/bags", "cache-bust-v4"],
     retry: false,
     staleTime: 0,
     gcTime: 0,
@@ -100,9 +100,11 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
 
   // DEBUG: Log state for production debugging  
   useEffect(() => {
-    console.log('CACHE BUST DEBUG - isPetCarrier:', isPetCarrier, 'knownBags.length:', knownBags.length, 'loading:', isLoadingKnownBags);
+    console.log('DEBUG - isPetCarrier:', isPetCarrier, 'knownBags.length:', knownBags.length, 'loading:', isLoadingKnownBags);
     if (knownBags.length > 0) {
-      console.log('First bag:', knownBags[0].brand, knownBags[0].model);
+      console.log('First bag:', knownBags[0]);
+      console.log('Pet carrier bags:', knownBags.filter(b => b.isPetCarrier).length);
+      console.log('Non-pet carrier bags:', knownBags.filter(b => !b.isPetCarrier).length);
     }
   }, [isPetCarrier, knownBags, isLoadingKnownBags]);
 
@@ -382,7 +384,8 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                 <Select value={selectedKnownBag} onValueChange={handleKnownBagSelect}>
                   <SelectTrigger data-testid="select-known-bag">
                     <SelectValue placeholder={(() => {
-                      // NUCLEAR CACHE BUST: Completely different filter implementation (Aug 20 2025)
+                      // DEBUG: Log filtering process
+                      console.log('Filtering bags - isPetCarrier:', isPetCarrier, 'Total bags:', knownBags.length);
                       let filteredBags: KnownBag[];
                       if (isPetCarrier === true) {
                         filteredBags = knownBags.filter((bag: KnownBag) => bag.isPetCarrier === true);
@@ -390,6 +393,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                         filteredBags = knownBags.slice(); // All bags when not filtering for pet carriers
                       }
                       const count = filteredBags.length;
+                      console.log('Filtered bags count:', count);
                       if (count <= 20) {
                         return `Choose from ${count} popular bag models...`;
                       } else {
