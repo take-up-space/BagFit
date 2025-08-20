@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import ResultsDisplay from "./ResultsDisplay";
 
@@ -55,6 +56,7 @@ interface BagCheckFormProps {
 
 export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
   const [selectedAirline, setSelectedAirline] = useState("");
   const [flightNumber, setFlightNumber] = useState("");
   const [unit, setUnit] = useState<"in" | "cm">(() => {
@@ -178,7 +180,16 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
     if (selectedUserBag) {
       // For user bags, we need to use the actual bag.id, not the userBag.id
       const userBag = userBags.find((ub: UserBag) => ub.id === selectedUserBag);
-      bagIdToSend = userBag?.bag.id || undefined;
+      if (!userBag) {
+        console.error("User bag not found:", selectedUserBag);
+        toast({
+          title: "Error",
+          description: "Selected bag not found. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      bagIdToSend = userBag.bag.id;
     }
 
     checkBagMutation.mutate({
@@ -381,7 +392,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
               </div>
               
               {/* Alternative: Select from My Bags */}
-              {userBags.length > 0 && (
+              {userBags.length > 0 && isAuthenticated && (
                 <>
                   <div className="text-center text-gray-500 text-sm mb-4">or</div>
                   <div className="mb-6">
