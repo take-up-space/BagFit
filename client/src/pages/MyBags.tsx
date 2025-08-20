@@ -615,7 +615,10 @@ export default function MyBags() {
                           <Button
                           variant="ghost"
                           size="sm"
-                          onClick={handleSaveBagName}
+                          onClick={() => {
+                            console.log("=== SAVE BUTTON CLICKED ===");
+                            handleSaveBagName();
+                          }}
                           disabled={updateBagNameMutation.isPending}
                           className="text-green-600 hover:text-green-700 hover:bg-green-50"
                           data-testid={`button-save-name-${userBag.id}`}
@@ -647,7 +650,10 @@ export default function MyBags() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleEditBagName(userBag)}
+                            onClick={() => {
+                              console.log("=== EDIT BUTTON CLICKED ===", userBag.id);
+                              handleEditBagName(userBag);
+                            }}
                             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                             data-testid={`button-edit-${userBag.id}`}
                           >
