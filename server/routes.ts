@@ -190,9 +190,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const { userBagId } = req.params;
       const updateSchema = z.object({
-        customName: z.string().min(1, "Custom name is required").optional(),
+        customName: z.string().optional(),
         isPetCarrier: z.boolean().optional()
-      }).refine(data => data.customName || data.isPetCarrier !== undefined, {
+      }).refine(data => {
+        const hasCustomName = data.customName !== undefined && data.customName.trim().length > 0;
+        const hasPetCarrierUpdate = data.isPetCarrier !== undefined;
+        return hasCustomName || hasPetCarrierUpdate;
+      }, {
         message: "Either customName or isPetCarrier must be provided"
       });
       
