@@ -15,7 +15,7 @@ export default function Landing() {
                 <img 
                   src={airplaneSeatIcon} 
                   alt="Airplane seat" 
-                  className="w-6 h-6 mr-3"
+                  className="w-6 h-6 mr-1"
                 />
                 BagFit
               </h1>
