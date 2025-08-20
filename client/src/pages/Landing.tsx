@@ -61,7 +61,7 @@ export default function Landing() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link 
-              href="/"
+              href="/home"
               className="bg-airline-blue text-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors inline-flex items-center"
               data-testid="button-try-guest"
             >
