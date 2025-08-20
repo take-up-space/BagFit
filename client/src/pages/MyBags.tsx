@@ -183,6 +183,8 @@ export default function MyBags() {
 
   const updateBagNameMutation = useMutation({
     mutationFn: async ({ userBagId, customName, isPetCarrier }: { userBagId: string; customName?: string; isPetCarrier?: boolean }) => {
+      console.log("🚨 MUTATION CALLED! Params:", { userBagId, customName, isPetCarrier });
+      
       const updateData: any = {};
       
       // Include customName if provided
@@ -257,6 +259,12 @@ export default function MyBags() {
       console.log("editingBagName:", editingBagName);
       console.log("editingBagIsPetCarrier:", editingBagIsPetCarrier);
       console.log("updateFields being sent:", updateFields);
+      
+      console.log("🔥 About to call mutation with:", {
+        userBagId: editingBagId,
+        customName: updateFields.customName,
+        isPetCarrier: updateFields.isPetCarrier
+      });
       
       updateBagNameMutation.mutate({
         userBagId: editingBagId,
