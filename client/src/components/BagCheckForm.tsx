@@ -90,17 +90,14 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
     meta: { on401: "returnNull" },
   });
 
-  // CACHE BUST: Use correct endpoint with cache-busting in query key only
+  // PRODUCTION CACHE-BUSTING: Custom fetch with timestamp to avoid deployment caching
   const { data: knownBags = [], isLoading: isLoadingKnownBags, error: knownBagsError } = useQuery<KnownBag[]>({
-    queryKey: ["/api/bags", "cache-bust-v4"],
+    queryKey: ["/api/bags", "cache-bust-v5", Date.now()],
     queryFn: async () => {
-      console.log('FETCHING: Making API call to /api/bags');
-      const response = await fetch('/api/bags');
-      console.log('FETCH RESPONSE: Status', response.status, 'OK:', response.ok);
+      const timestamp = Date.now();
+      const response = await fetch(`/api/bags?_cb=${timestamp}`);
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
-      console.log('PARSED DATA: Type:', typeof data, 'Is Array:', Array.isArray(data), 'Length:', data?.length);
-      console.log('PARSED DATA: First few items:', data?.slice(0, 3));
       return data;
     },
     retry: false,

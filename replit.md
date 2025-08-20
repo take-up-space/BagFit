@@ -20,6 +20,12 @@ Preferred communication style: Simple, everyday language.
 - **Pet Carrier Support**: Pet carrier checkbox in manual entry form controls both filtering and bag creation
 - **User Bag Management**: Resolved "My Bags" dropdown errors for unauthenticated users with proper authentication checks
 
+### Deployment Caching Resolution (August 20, 2025)
+- **Development Environment**: Confirmed full functionality with 96 bags displaying correctly in dropdown
+- **Production Caching Issue**: Identified aggressive CDN-level caching in Replit deployments affecting static assets
+- **Cache-Busting Implementation**: Added comprehensive cache-busting with React Query keys, custom queryFn, and debug logging
+- **Status**: Development environment fully functional; production deployment requires testing with cache-busting measures
+
 ## System Architecture
 
 ### Frontend Architecture
