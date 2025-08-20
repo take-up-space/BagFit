@@ -372,6 +372,7 @@ export default function BagCheckForm({ onAirlineSelect }: BagCheckFormProps) {
                 <Select value={selectedKnownBag} onValueChange={handleKnownBagSelect}>
                   <SelectTrigger data-testid="select-known-bag">
                     <SelectValue placeholder={(() => {
+                      // Filter bags: pet carrier checkbox controls display
                       const filteredBags = knownBags.filter((bag: KnownBag) => isPetCarrier ? bag.isPetCarrier : true);
                       const count = filteredBags.length;
                       if (count <= 20) {
