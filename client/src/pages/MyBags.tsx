@@ -227,12 +227,18 @@ export default function MyBags() {
   };
 
   const handleSaveBagName = () => {
-    if (editingBagId && editingBagName.trim()) {
-      updateBagNameMutation.mutate({
+    if (editingBagId) {
+      const updateData: any = {
         userBagId: editingBagId,
-        customName: editingBagName.trim(),
         isPetCarrier: editingBagIsPetCarrier,
-      });
+      };
+      
+      // Only include customName if it has content
+      if (editingBagName.trim()) {
+        updateData.customName = editingBagName.trim();
+      }
+      
+      updateBagNameMutation.mutate(updateData);
     }
   };
 
