@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import BagCheckForm from "@/components/BagCheckForm";
 import Sidebar from "@/components/Sidebar";
 import AirlineReference from "@/components/AirlineReference";
-import airplaneSeatIcon from "@assets/AirplaneChair_Icon_1755563723564.png";
+import airplaneSeatIcon from "@assets/PetCarrier.png";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
@@ -20,7 +20,7 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-airline-blue flex items-center">
                 <img 
                   src={airplaneSeatIcon} 
-                  alt="Airplane seat" 
+                  alt="Pet Carrier" 
                   className="w-6 h-6 mr-1"
                 />
                 BagFit
@@ -84,9 +84,9 @@ export default function Home() {
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Will Your Bag Fit Under the Seat in Front of You?
+            Will My Pet Fit?
           </h1>
-          <p className="text-xl text-gray-600 mb-6 max-w-2xl mx-auto">Check your personal item dimensions against airline underseat space requirements. Avoid surprises at the gate with verified airline data.{!isAuthenticated && (
+          <p className="text-xl text-gray-600 mb-6 max-w-2xl mx-auto">Check if your pet carrier will fit under the seat in front of you.  {!isAuthenticated && (
               <span className="block mt-2 text-sm text-blue-600">
                 💡 <a href="/api/login" className="underline hover:text-blue-800">Create a free account</a> to save your bags for future trips!
               </span>

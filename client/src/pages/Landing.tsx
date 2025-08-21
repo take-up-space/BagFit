@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import airplaneSeatIcon from "@assets/AirplaneChair_Icon_1755563723564.png";
+import airplaneSeatIcon from "@assets/PetCarrier.png";
 
 export default function Landing() {
   return (
@@ -14,7 +14,7 @@ export default function Landing() {
               <h1 className="text-2xl font-bold text-airline-blue flex items-center">
                 <img 
                   src={airplaneSeatIcon} 
-                  alt="Airplane seat" 
+                  alt="Pet Carrier" 
                   className="w-6 h-6 mr-1"
                 />
                 BagFit
@@ -37,11 +37,11 @@ export default function Landing() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Will Your Bag Fit Under the Seat in Front of You?
+            Will My Pet Fit?
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Check your personal item dimensions against airline underseat space requirements. 
-            Avoid surprises at the gate with verified airline data and save money on baggage fees.
+            Flying with a pet is stressful. Use this tool to avoid surprises at the gate! 
+          
           </p>
           
           <div className="flex justify-center items-center space-x-8 text-sm text-gray-500 mb-8">
