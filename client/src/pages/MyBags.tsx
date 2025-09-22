@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import airplaneSeatIcon from "@assets/PetCarrier.png";
+import airplaneSeatIcon from "@assets/AirplaneChair_Icon.png";
 
 interface UserBag {
   id: string;

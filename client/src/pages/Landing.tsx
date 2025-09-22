@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import airplaneSeatIcon from "@assets/PetCarrier.png";
+import airplaneSeatIcon from "@assets/AirplaneChair_Icon.png";
 
 export default function Landing() {
   return (
@@ -37,10 +37,10 @@ export default function Landing() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Will My Pet Fit?
+            Will My Bag Fit?
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Flying with a pet is stressful. Use this tool to avoid surprises at the gate! 
+            Flying is already stressful. Use this tool to avoid surprises at the gate! 
           
           </p>
           
